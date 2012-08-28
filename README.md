@@ -1,10 +1,10 @@
-SimpleSerializer
+Simple-Serializer
 ================
 
 Introduction
 ------------
 
-SimpleSerializer allows you to serialize your objects into a requested output format such as JSON.
+Simple-Serializer allows you to serialize your objects into a requested output format such as JSON.
 The library is written to work with DTO objects in the REST services.
 
 Built-in features include:
@@ -23,7 +23,7 @@ Possible TODO list:
 Installation
 ------------
 
-To install SimpleSerializer with Composer just add the following to your `composer.json` file:
+To install Simple-Serializer with Composer just add the following to your `composer.json` file:
 
 .. code-block :: js
 
