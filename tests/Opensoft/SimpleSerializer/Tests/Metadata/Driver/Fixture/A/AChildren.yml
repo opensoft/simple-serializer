@@ -1,0 +1,18 @@
+Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren:
+    properties:
+        float:
+            type: double
+            serialized_name: float
+            expose: true
+        dateTime:
+            type: DateTime
+            expose: true
+        "null":
+            type: string
+            expose: true
+        array:
+            type: array
+            expose: true
+        assocArray:
+            type: array
+            expose: true

@@ -1,0 +1,5 @@
+Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\D:
+    properties:
+        rid:
+            type: undefinedType
+            expose: true

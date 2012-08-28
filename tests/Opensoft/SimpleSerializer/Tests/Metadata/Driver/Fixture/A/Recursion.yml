@@ -1,0 +1,5 @@
+Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\Recursion:
+    properties:
+        object:
+            type: Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\Recursion
+            expose: true

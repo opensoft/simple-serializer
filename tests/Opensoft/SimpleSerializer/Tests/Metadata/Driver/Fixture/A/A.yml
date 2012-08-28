@@ -1,0 +1,14 @@
+Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A:
+    properties:
+        rid:
+            type: integer
+            serialized_name: id
+            expose: true
+        name:
+            type: string
+            expose: true
+        status:
+            type: boolean
+            expose: true
+        hiddenStatus:
+            type: boolean

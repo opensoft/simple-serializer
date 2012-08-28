@@ -1,0 +1,11 @@
+Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E:
+    properties:
+        rid:
+            type: integer
+            expose: true
+        object:
+            type: Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren
+            expose: true
+        arrayOfObjects:
+            type: array<Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren>
+            expose: true

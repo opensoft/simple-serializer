@@ -1,0 +1,24 @@
+{
+    "name": "opensoft/simple-serializer",
+    "type": "library",
+    "description": "Simple Serializer",
+    "keywords": ["json","serializer", "php"],
+    "homepage": "http://github.com/opensoft/php-fedex",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dmitry Petrov",
+            "email": "dmitry.petrov@opensoftdev.ru",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/yaml": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "Opensoft": "src"
+        }
+    }
+}
