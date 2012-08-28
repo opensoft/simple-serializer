@@ -19,6 +19,8 @@ Possible TODO list:
 - configurable via PHP, XML, or annotations
 - custom integrates with Doctrine ORM, et. al.
 
+[![Build Status](https://secure.travis-ci.org/opensoft/simple-serializer.png?branch=master)](http://travis-ci.org/opensoft/simple-serializer)
+
 
 Installation
 ------------
