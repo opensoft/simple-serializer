@@ -15,6 +15,7 @@ use Serializable;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class ClassMetadata implements Serializable
 {

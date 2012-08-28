@@ -14,6 +14,7 @@ namespace Opensoft\SimpleSerializer\Metadata\Driver;
 use Opensoft\SimpleSerializer\Metadata\ClassMetadata;
 
 /**
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  */
 abstract class FileDriverAbstract implements DriverInterface

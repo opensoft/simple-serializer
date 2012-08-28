@@ -13,6 +13,7 @@ namespace Opensoft\SimpleSerializer\Metadata;;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 interface MetadataFactoryInterface
 {

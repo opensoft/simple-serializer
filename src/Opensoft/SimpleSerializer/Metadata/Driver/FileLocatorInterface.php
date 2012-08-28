@@ -12,6 +12,7 @@
 namespace Opensoft\SimpleSerializer\Metadata\Driver;
 
 /**
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  */
 interface FileLocatorInterface

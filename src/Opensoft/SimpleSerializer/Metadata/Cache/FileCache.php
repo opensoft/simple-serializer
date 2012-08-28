@@ -15,6 +15,7 @@ use Opensoft\SimpleSerializer\Metadata\ClassMetadata;
 use Opensoft\SimpleSerializer\Exception\InvalidArgumentException;
 
 /**
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  */
 class FileCache implements CacheInterface

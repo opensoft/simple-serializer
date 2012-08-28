@@ -16,6 +16,7 @@ use Opensoft\SimpleSerializer\Metadata\Cache\CacheInterface;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 final class MetadataFactory implements MetadataFactoryInterface
 {
