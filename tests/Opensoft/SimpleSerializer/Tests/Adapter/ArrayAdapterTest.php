@@ -54,7 +54,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             ->setStatus(false)
             ->setHiddenStatus(true);
         $object->setFloat(3.23)
-            ->setArray(array(3,2,44))
+            ->setArray(array(3, 2, null))
             ->setAssocArray(array('true' => 345, 'false' => 34));
         $time = time();
         $object->setDateTime(new DateTime(date('Y-m-d H:i:s', $time)));
@@ -76,7 +76,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3.23, $result['float']);
         $testTime = new DateTime(date('Y-m-d H:i:s', $time));
         $this->assertEquals($testTime->format(DateTime::ISO8601), $result['dateTime']);
-        $this->assertEquals(array(3,2,44), $result['array']);
+        $this->assertEquals(array(3, 2, null), $result['array']);
         $this->assertEquals(array('true' => 345, 'false' => 34), $result['assocArray']);
 
         $objectComplex = new E();
@@ -124,7 +124,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
                 'hiddenStatus' => false,
                 'float' => 3.23,
                 'null' => null,
-                'array' => array(23, 24),
+                'array' => array(23, null),
                 'assocArray' => array('str' => 34),
                 'dateTime' => '2005-08-15T15:52:01+0000'
             ),
@@ -136,7 +136,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
                     'hiddenStatus' => false,
                     'float' => 3.23,
                     'null' => null,
-                    'array' => array(23, 24),
+                    'array' => array(23, null),
                     'assocArray' => array('str' => 34),
                     'dateTime' => '2005-08-15T15:52:01+0000'
                 )
@@ -159,13 +159,30 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $arrayA = $result->getObject()->getArray();
         $this->assertCount(2, $arrayA);
         $this->assertEquals(23, $arrayA[0]);
-        $this->assertEquals(24, $arrayA[1]);
+        $this->assertNull($arrayA[1]);
         $arrayAssoc = $result->getObject()->getAssocArray();
         $this->assertCount(1, $arrayAssoc);
         $this->assertArrayHasKey('str', $arrayAssoc);
         $this->assertEquals(34, $arrayAssoc['str']);
         $this->assertInstanceOf('\DateTime', $result->getObject()->getDateTime());
         $this->assertEquals('2005-08-15T15:52:01+0000', $result->getObject()->getDateTime()->format(DateTime::ISO8601));
+        
+        $this->assertEquals(3, $objects[0]->getRid());
+        $this->assertEquals('test', $objects[0]->getName());
+        $this->assertTrue($objects[0]->getStatus());
+        $this->assertNull($objects[0]->getHiddenStatus());
+        $this->assertEquals(3.23, $objects[0]->getFloat());
+        $this->assertNull($objects[0]->getNull());
+        $arrayA = $objects[0]->getArray();
+        $this->assertCount(2, $arrayA);
+        $this->assertEquals(23, $arrayA[0]);
+        $this->assertNull($arrayA[1]);
+        $arrayAssoc = $objects[0]->getAssocArray();
+        $this->assertCount(1, $arrayAssoc);
+        $this->assertArrayHasKey('str', $arrayAssoc);
+        $this->assertEquals(34, $arrayAssoc['str']);
+        $this->assertInstanceOf('\DateTime', $objects[0]->getDateTime());
+        $this->assertEquals('2005-08-15T15:52:01+0000', $objects[0]->getDateTime()->format(DateTime::ISO8601));
     }
 
     /**
