@@ -113,6 +113,7 @@ class ArrayAdapter implements BaseArrayAdapter
      * @param PropertyMetadata $property
      * @param $direct
      * @param null|mixed $object
+     * @param bool $inner
      * @throws \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
      * @return array|bool|float|int|string|null
      */
@@ -128,9 +129,16 @@ class ArrayAdapter implements BaseArrayAdapter
                 $value = (integer)$value;
             } elseif ($type === 'double') {
                 $value = (double)$value;
-            } elseif ($type === 'DateTime') {
+            } elseif ($type === 'DateTime' || ($type[0] === 'D' && strpos($type, 'DateTime<') === 0)) {
                 if ($direct == self::DIRECTION_SERIALIZE) {
-                    $value = $value->format(DateTime::ISO8601);
+                    $dateTimeFormat = DateTime::ISO8601;
+                    if (preg_match('/DateTime<(?<type>[a-zA-Z0-9\,\.\s\-\:\/\\\]+)>/', $type, $matches)) {
+                        $dateTimeFormat = $matches['type'];
+                        if (defined('\DateTime::' . $dateTimeFormat)) {
+                            $dateTimeFormat = constant('\DateTime::' . $dateTimeFormat);
+                        }
+                    }
+                    $value = $value->format($dateTimeFormat);
                 } elseif ($direct == self::DIRECTION_UNSERIALIZE) {
                     $value = new DateTime($value);
                 }

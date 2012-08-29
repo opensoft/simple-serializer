@@ -16,6 +16,7 @@ use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\D;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\Recursion;
+use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\DateTime as TestDateTime;
 use Opensoft\SimpleSerializer\Adapter\ArrayAdapterInterface;
 use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
 use DateTime;
@@ -89,6 +90,27 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($result, $resultComplex['object']);
         $this->assertArrayHasKey('arrayOfObjects', $resultComplex);
         $this->assertEquals(array($result, $result), $resultComplex['arrayOfObjects']);
+    }
+
+    public function testToArrayDateTime()
+    {
+        $object = new TestDateTime();
+        $time = new DateTime();
+        $object->setDateTimeConstant($time)
+            ->setDateTimeString($time)
+            ->setDateTimeStringWithSpace($time)
+            ->setEmptyDateTimeFormat($time);
+
+        $result = $this->unitUnderTest->toArray($object);
+        $this->assertCount(4, $result);
+        $this->assertArrayHasKey('dateTimeConstant', $result);
+        $this->assertArrayHasKey('dateTimeString', $result);
+        $this->assertArrayHasKey('dateTimeStringWithSpace', $result);
+        $this->assertArrayHasKey('emptyDateTimeFormat', $result);
+        $this->assertEquals($time->format(DateTime::COOKIE), $result['dateTimeConstant']);
+        $this->assertEquals($time->format('Y-m-d\TH:i:sP'), $result['dateTimeString']);
+        $this->assertEquals($time->format('D, d M y H:i:s O'), $result['dateTimeStringWithSpace']);
+        $this->assertEquals($time->format(DateTime::ISO8601), $result['emptyDateTimeFormat']);
     }
 
     /**

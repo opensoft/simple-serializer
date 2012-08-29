@@ -1,0 +1,14 @@
+Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\DateTime:
+    properties:
+        emptyDateTimeFormat:
+            type: DateTime
+            expose: true
+        dateTimeConstant:
+            type: DateTime<COOKIE>
+            expose: true
+        dateTimeString:
+            type: DateTime<Y-m-d\TH:i:sP>
+            expose: true
+        dateTimeStringWithSpace:
+            type: DateTime<D, d M y H:i:s O>
+            expose: true
