@@ -16,6 +16,7 @@
         "php": ">=5.3.3",
         "symfony/yaml": "dev-master"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-0": {
             "Opensoft": "src"
