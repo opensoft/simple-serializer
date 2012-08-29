@@ -10,14 +10,22 @@ The library is written to work with DTO objects in the REST services.
 Built-in features include:
 
 - (de-)serialize object graphs
-- supports boolean, integer, double, DateTime, array, T, array<T>, null types, where "T" - is some PHP object.
+- supports boolean, integer, double, DateTime\<format\>, array, T, array\<T\>, null types, where "T" - is some PHP object.
 - configurable via YAML
+
+Some Restrictions:
+
+- object must have configuration for serialize/unserialize
+- object must have set/get methods for serialize/unserialize attributes
 
 Possible TODO list:
 
 - (de-)serialize object graphs of any complexity including circular references
 - configurable via PHP, XML, or annotations
 - custom integrates with Doctrine ORM, et. al.
+
+It should be noted that Simple-Serializer is realy simple library with minimum configuration,
+but it provides wide opportunity for create REST API.
 
 [![Build Status](https://secure.travis-ci.org/opensoft/simple-serializer.png?branch=master)](http://travis-ci.org/opensoft/simple-serializer)
 
@@ -40,8 +48,6 @@ To install Simple-Serializer with Composer just add the following to your `compo
 
 Then, you can install the new dependencies by running Composer's ``update``
 command from the directory where your ``composer.json`` file is located:
-
-.. code-block :: bash
 
     $ php composer.phar update
 
