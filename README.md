@@ -27,8 +27,7 @@ Installation
 
 To install Simple-Serializer with Composer just add the following to your `composer.json` file:
 
-.. code-block :: js
-
+```javascript
     // composer.json
     {
         // ...
@@ -37,6 +36,7 @@ To install Simple-Serializer with Composer just add the following to your `compo
             "opensoft/simple-serializer": "dev-master"
         }
     }
+```
 
 Then, you can install the new dependencies by running Composer's ``update``
 command from the directory where your ``composer.json`` file is located:
@@ -48,35 +48,49 @@ command from the directory where your ``composer.json`` file is located:
 Configuration
 -------------
 
-# MyBundle\Resources\config\serializer\ClassName.yml
+```yml
+MyBundle\Resources\config\serializer\ClassName.yml
     Fully\Qualified\ClassName:
         properties:
             some-property:
                 expose: true
                 type: string
                 serialized_name: foo
+```
+
+* expose
+ * true
+ * false (default)
+* type
+ * integer
+ * boolean
+ * double
+ * string
+ * array
+ * T - fully qualified class name
+ * array<T>
+* serialized_name
+ * default value is equal name property
 
 Serializing Objects
 -------------------
 Most common usage is probably to serialize objects. This can be achieved
 very easily:
 
-.. code-block :: php
-
+```php
     <?php
-
     $serializer = $this->getSerializer(); //get Serializer
     $serializer->serialize($object);
+```
 
 Deserializing Objects
 ---------------------
 You can also deserialize objects from JSON representation. For
 example, when accepting data via an API.
 
-.. code-block :: php
-
+```php
     <?php
-
     $object = $this->getClassName();//get Fully\Qualified\ClassName
     $serializer = $this->getSerializer(); //get Serializer
     $object = $serializer->deserialize($jsonData, $object);
+```
