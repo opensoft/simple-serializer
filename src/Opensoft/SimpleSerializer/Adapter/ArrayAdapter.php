@@ -79,7 +79,7 @@ class ArrayAdapter implements BaseArrayAdapter
         $className = $this->getFullClassName($object);
         $metadata = $this->metadataFactory->getMetadataForClass($className);
         foreach ($metadata->getProperties() as $property) {
-            if (!$property->isExpose() || !isset($data[$property->getSerializedName()])) {
+            if (!$property->isExpose() || !array_key_exists($property->getSerializedName(), $data)) {
                 continue;
             }
             $value = $this->handleValue($data[$property->getSerializedName()], $property, self::DIRECTION_UNSERIALIZE, $object);

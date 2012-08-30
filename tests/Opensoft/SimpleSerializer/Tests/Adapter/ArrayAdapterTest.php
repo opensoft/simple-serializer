@@ -216,6 +216,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $objectA = new AChildren();
         $objectA->setRid(11);
         $objectA->setName(23);
+        $objectA->setFloat(2.3);
         $objectA->setHiddenStatus(true);
         $object->setRid(2);
         $object->setObject($objectA);
@@ -223,11 +224,13 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $array = array(
             'rid' => 23,
             'object' => array(
-                'id' => 3
+                'id' => 3,
+                'float' => null
             ),
             'arrayOfObjects' => array(
                 array(
-                    'id' => 3
+                    'id' => 3,
+                    'float' => null
                 )
             )
         );
@@ -241,9 +244,11 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(23, $result->getRid());
         $this->assertEquals(3, $result->getObject()->getRid());
         $this->assertEquals(23, $result->getObject()->getName());
+        $this->assertNull($result->getObject()->getFloat());
         $this->assertTrue($result->getObject()->getHiddenStatus());
         $this->assertEquals(3, $objects[0]->getRid());
         $this->assertEquals(23, $objects[0]->getName());
+        $this->assertNull($objects[0]->getFloat());
         $this->assertTrue($objects[0]->getHiddenStatus());
     }
 
