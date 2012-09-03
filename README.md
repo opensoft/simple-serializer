@@ -74,9 +74,9 @@ MyBundle\Resources\config\serializer\ClassName.yml
  * string
  * array
  * T - fully qualified class name
- * array<T>
+ * array\<T\>
  * DateTime
- * DateTime<format>
+ * DateTime\<format\>
   * format could be name of DateTime constant (COOKIE, ISO8601), string or empty (default format is ISO8601)
 * serialized_name
  * default value is equal name property
