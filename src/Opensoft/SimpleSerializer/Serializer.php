@@ -40,12 +40,20 @@ class Serializer
     }
 
     /**
-     * @param object $object
+     * @param object|array $objects
      * @return string
      */
-    public function serialize($object)
+    public function serialize($objects)
     {
-        $dataAsArray = $this->arrayAdapter->toArray($object);
+        $dataAsArray = array();
+        if (is_array($objects)) {
+            foreach ($objects as $object) {
+                $dataAsArray[] = $this->arrayAdapter->toArray($object);
+            }
+        } else {
+            $dataAsArray = $this->arrayAdapter->toArray($objects);
+        }
+
 
         return $this->serializerAdapter->serialize($dataAsArray);
     }

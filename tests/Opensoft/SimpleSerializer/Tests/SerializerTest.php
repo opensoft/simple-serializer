@@ -55,6 +55,29 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedString, $result);
     }
 
+    public function testArraySerialize()
+    {
+        $time = time();
+        $testTime = new \DateTime(date('Y-m-d H:i:s', $time));
+        $aChildren = new AChildren();
+        $aChildren->setRid(1);
+        $aChildren->setStatus(true);
+        $aChildren->setHiddenStatus(true);
+        $aChildren->setFloat(3.23);
+        $aChildren->setArray(array(3, null));
+        $aChildren->setAssocArray(array('tr' => 2));
+        $aChildren->setDateTime($testTime);
+        $aChildren->setNull(null);
+        $aChildren->setName('name');
+        $e = new E();
+        $e->setRid(3);
+        $e->setObject($aChildren);
+        $e->setArrayOfObjects(array($aChildren));
+        $result = $this->unitUnderTest->serialize(array($e));
+        $expectedString = '[{"rid":3,"object":{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}},"arrayOfObjects":[{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}}]}]';
+        $this->assertEquals($expectedString, $result);
+    }
+
     public function testUnserialize()
     {
         $time = time();
