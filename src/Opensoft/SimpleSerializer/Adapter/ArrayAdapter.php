@@ -38,11 +38,18 @@ class ArrayAdapter implements BaseArrayAdapter
     private $exclusionStrategy;
 
     /**
-     * @param MetadataFactory $metadataFactory
+     * @var boolean
      */
-    public function __construct(MetadataFactory $metadataFactory)
+    private $strictUnserializeMode;
+
+    /**
+     * @param MetadataFactory $metadataFactory
+     * @param boolean $strictUnserializeMode
+     */
+    public function __construct(MetadataFactory $metadataFactory, $strictUnserializeMode = false)
     {
         $this->metadataFactory = $metadataFactory;
+        $this->strictUnserializeMode = $strictUnserializeMode;
     }
 
     /**
@@ -84,9 +91,19 @@ class ArrayAdapter implements BaseArrayAdapter
     {
         $className = $this->getFullClassName($object);
         $metadata = $this->metadataFactory->getMetadataForClass($className);
+        $unserializedProperties = 0;
         foreach ($metadata->getProperties() as $property) {
-            if (!$property->isExpose() || ($this->exclusionStrategy !== null && $this->exclusionStrategy->shouldSkipProperty($property))
-                || !array_key_exists($property->getSerializedName(), $data)) {
+            if (!$property->isExpose() || ($this->exclusionStrategy !== null && $this->exclusionStrategy->shouldSkipProperty($property))) {
+                if ($this->isStrictUnserializeMode() && array_key_exists($property->getSerializedName(), $data)) {
+                    throw new InvalidArgumentException(sprintf('%s extra field', $property->getSerializedName()));
+                }
+                continue;
+            }
+
+            if (!array_key_exists($property->getSerializedName(), $data)) {
+                if ($this->isStrictUnserializeMode()) {
+                    throw new InvalidArgumentException(sprintf('%s field is lost', $property->getSerializedName()));
+                }
                 continue;
             }
             $value = $this->handleValue($data[$property->getSerializedName()], $property, self::DIRECTION_UNSERIALIZE, $object);
@@ -96,6 +113,11 @@ class ArrayAdapter implements BaseArrayAdapter
             }
 
             call_user_func_array(array($object, 'set' . ucfirst($property->getName())), array($value));
+            $unserializedProperties ++;
+        }
+
+        if ($this->isStrictUnserializeMode() && $unserializedProperties !== count($data)) {
+            throw new InvalidArgumentException('Wrong number of fields in the deserialized data');
         }
 
         return $object;
@@ -112,6 +134,24 @@ class ArrayAdapter implements BaseArrayAdapter
         $this->exclusionStrategy = $exclusionStrategy;
 
         return $this;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param boolean $strictUnserializeMode
+     */
+    public function setStrictUnserializeMode($strictUnserializeMode)
+    {
+        $this->strictUnserializeMode = (bool) $strictUnserializeMode;
+    }
+
+    /**
+     * @return boolean
+     */
+    private function isStrictUnserializeMode()
+    {
+        return $this->strictUnserializeMode;
     }
 
     /**

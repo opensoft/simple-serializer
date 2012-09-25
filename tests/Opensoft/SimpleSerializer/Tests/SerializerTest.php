@@ -296,6 +296,32 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($testTime->format(\DateTime::ISO8601), $objects[0]->getDateTime()->format(DateTime::ISO8601));
     }
 
+    public function testStrictUnserialize()
+    {
+        $data = '{"id":1,"name":"name","status":true}';
+        $emptyObject = new A();
+
+        $this->unitUnderTest->setStrictUnserializeMode(true);
+        $result = $this->unitUnderTest->unserialize($data, $emptyObject);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(1, $result->getRid());
+        $this->assertEquals('name', $result->getName());
+        $this->assertTrue($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+    }
+
+    /**
+     * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
+     */
+    public function testStrictUnserializeFailed()
+    {
+        $data = '{"id":1,"name":"name"}';
+        $emptyObject = new A();
+
+        $this->unitUnderTest->setStrictUnserializeMode(true);
+        $this->unitUnderTest->unserialize($data, $emptyObject);
+    }
+
     protected function setUp()
     {
         $locator = $this->getMockForAbstractClass(

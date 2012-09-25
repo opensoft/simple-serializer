@@ -407,6 +407,53 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
+     */
+    public function testStrictUnserializeHasExtraFields()
+    {
+        $this->unitUnderTest->setStrictUnserializeMode(true);
+        $object = new A();
+        $array = array(
+            'id' => 3,
+            'name' => 'test',
+            'status' => true,
+            'hiddenStatus' => false
+        );
+        $this->unitUnderTest->toObject($array, $object);
+    }
+
+    /**
+     * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
+     */
+    public function testStrictUnserializeLostField()
+    {
+        $this->unitUnderTest->setStrictUnserializeMode(true);
+        $object = new A();
+        $array = array(
+            'id' => 3,
+            'name' => 'test',
+            'extraField' => 'TEST'
+        );
+        $this->unitUnderTest->toObject($array, $object);
+    }
+
+    /**
+     * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
+     */
+    public function testStrictUnserializeWrongNumberOfFields()
+    {
+        $this->unitUnderTest->setStrictUnserializeMode(true);
+        $object = new A();
+        $array = array(
+            'id' => 3,
+            'name' => 'test',
+            'status' => true,
+            'HAHA' => false
+        );
+        $this->unitUnderTest->toObject($array, $object);
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected function setUp()

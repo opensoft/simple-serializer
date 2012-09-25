@@ -109,4 +109,12 @@ class Serializer
 
         $this->arrayAdapter->setExclusionStrategy(new GroupsExclusionStrategy($groups));
     }
+
+    /**
+     * @param $strictUnserializeMode
+     */
+    public function setStrictUnserializeMode($strictUnserializeMode)
+    {
+        $this->arrayAdapter->setStrictUnserializeMode($strictUnserializeMode);
+    }
 }
