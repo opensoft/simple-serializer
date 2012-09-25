@@ -113,7 +113,7 @@ very easily:
 
 Deserializing Objects
 ---------------------
-You can also deserialize objects from JSON representation. For
+You can also unserialize objects from JSON representation. For
 example, when accepting data via an API.
 
 ```php
@@ -122,16 +122,16 @@ example, when accepting data via an API.
     $object = $this->getClassName();
     //get Serializer
     $serializer = $this->getSerializer();
-    $object = $serializer->deserialize($jsonData, $object);
+    $object = $serializer->unserialize($jsonData, $object);
     //Unserialize array of the objects
-    $objects = $serializer->deserialize($jsonData, array($object));
+    $objects = $serializer->unserialize($jsonData, array($object));
     //Unserialize specific groups
     $serializer->setGroups(array('get'));
-    $object = $serializer->deserialize($jsonData, $object);
+    $object = $serializer->unserialize($jsonData, $object);
     //Unserialize specific version
     $serializer->setVersion('1.0');
-    $object = $serializer->deserialize($jsonData, $object);
+    $object = $serializer->unserialize($jsonData, $object);
     //Strict unserialize mode
     $serializer->setStrictUnserializeMode(true);
-    $object = $serializer->deserialize($jsonData, $object);
+    $object = $serializer->unserialize($jsonData, $object);
 ```
