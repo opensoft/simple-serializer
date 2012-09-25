@@ -62,6 +62,9 @@ MyBundle\Resources\config\serializer\ClassName.yml
                 expose: true
                 type: string
                 serialized_name: foo
+                since_version: 1.0
+                until_version: 2.0
+                groups: ['get','patch']
 ```
 
 * expose
@@ -80,6 +83,12 @@ MyBundle\Resources\config\serializer\ClassName.yml
   * format could be name of DateTime constant (COOKIE, ISO8601), string or empty (default format is ISO8601)
 * serialized_name
  * default value is equal name property
+* since_version
+ * string
+* until_version
+ * string
+* groups
+ * array
 
 Serializing Objects
 -------------------
@@ -88,8 +97,17 @@ very easily:
 
 ```php
     <?php
-    $serializer = $this->getSerializer(); //get Serializer
-    $serializer->serialize($object);
+    //get Serializer
+    $serializer = $this->getSerializer();
+    $string = $serializer->serialize($object);
+    //Serialize array of the objects
+    $string = $serializer->serialize(array($object));
+    //Serialize specific groups
+    $serializer->setGroups(array('get'));
+    $string = $serializer->serialize($object);
+    //Serialize specific version
+    $serializer->setVersion('1.0');
+    $string = $serializer->serialize($object);
 ```
 
 Deserializing Objects
@@ -99,7 +117,17 @@ example, when accepting data via an API.
 
 ```php
     <?php
-    $object = $this->getClassName();//get Fully\Qualified\ClassName
-    $serializer = $this->getSerializer(); //get Serializer
+    //get Fully\Qualified\ClassName
+    $object = $this->getClassName();
+    //get Serializer
+    $serializer = $this->getSerializer();
+    $object = $serializer->deserialize($jsonData, $object);
+    //Unserialize array of the objects
+    $objects = $serializer->deserialize($jsonData, array($object));
+    //Unserialize specific groups
+    $serializer->setGroups(array('get'));
+    $object = $serializer->deserialize($jsonData, $object);
+    //Unserialize specific version
+    $serializer->setVersion('1.0');
     $object = $serializer->deserialize($jsonData, $object);
 ```

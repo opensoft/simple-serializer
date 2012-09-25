@@ -50,6 +50,9 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('status', $properties['status']->getSerializedName());
         $this->assertEquals('boolean', $properties['status']->getType());
         $this->assertTrue($properties['status']->isExpose());
+        $this->assertEquals('1.1', $properties['status']->getSinceVersion());
+        $this->assertEquals('2.1', $properties['status']->getUntilVersion());
+        $this->assertEquals(array('post', 'patch', 'get'), $properties['status']->getGroups());
 
         $this->assertEquals('hiddenStatus', $properties['hiddenStatus']->getName());
         $this->assertEquals('hiddenStatus', $properties['hiddenStatus']->getSerializedName());

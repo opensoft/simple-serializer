@@ -40,6 +40,9 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('serialized', $unitUnderTest->getSerializedName());
         $unitUnderTest->setType('string');
         $this->assertEquals('string', $unitUnderTest->getType());
+        $unitUnderTest->setGroups(array('string', 'test'));
+        $this->assertCount(2, $unitUnderTest->getGroups());
+        $this->assertEquals(array('string', 'test'), $unitUnderTest->getGroups());
     }
 
     /**
@@ -51,7 +54,10 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
         $unitUnderTest = new PropertyMetadata('test');
         $unitUnderTest->setExpose(true)
             ->setSerializedName('serialize')
-            ->setType('string');
+            ->setType('string')
+            ->setGroups(array('test'))
+            ->setSinceVersion('1.0')
+            ->setUntilVersion('2.0');
 
         $serializedString = serialize($unitUnderTest);
         $unserializedObject = unserialize($serializedString);
@@ -60,5 +66,9 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($unserializedObject->isExpose());
         $this->assertEquals('string', $unserializedObject->getType());
         $this->assertEquals('serialize', $unserializedObject->getSerializedName());
+        $this->assertEquals(array('test'), $unserializedObject->getGroups());
+        $this->assertEquals('1.0', $unserializedObject->getSinceVersion());
+        $this->assertEquals('2.0', $unserializedObject->getUntilVersion());
+
     }
 }

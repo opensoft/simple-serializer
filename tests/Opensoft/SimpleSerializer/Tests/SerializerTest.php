@@ -15,6 +15,7 @@ use Opensoft\SimpleSerializer\Serializer;
 use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
+use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A;
 use DateTime;
 
 /**
@@ -52,6 +53,59 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $e->setArrayOfObjects(array($aChildren));
         $result = $this->unitUnderTest->serialize($e);
         $expectedString = '{"rid":3,"object":{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}},"arrayOfObjects":[{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}}]}';
+        $this->assertEquals($expectedString, $result);
+    }
+
+    public function testSerializeGroup()
+    {
+        $a = new A();
+        $a->setRid(1);
+        $a->setName('name');
+        $a->setStatus(true);
+        $a->setHiddenStatus(true);
+
+        $this->unitUnderTest->setGroups(array('test'));
+        $result = $this->unitUnderTest->serialize($a);
+        $expectedString = '[]';
+        $this->assertEquals($expectedString, $result);
+
+        $this->unitUnderTest->setGroups(array('get'));
+        $result = $this->unitUnderTest->serialize($a);
+        $expectedString = '{"status":true}';
+        $this->assertEquals($expectedString, $result);
+
+        $this->unitUnderTest->setGroups(array());
+        $result = $this->unitUnderTest->serialize($a);
+        $expectedString = '{"id":1,"name":"name","status":true}';
+        $this->assertEquals($expectedString, $result);
+    }
+
+    public function testSerializeVersion()
+    {
+        $a = new A();
+        $a->setRid(1);
+        $a->setName('name');
+        $a->setStatus(true);
+        $a->setHiddenStatus(true);
+
+        $this->unitUnderTest->setVersion('0.5');
+        $result = $this->unitUnderTest->serialize($a);
+        $expectedString = '{"id":1,"name":"name"}';
+        $this->assertEquals($expectedString, $result);
+
+        $this->unitUnderTest->setVersion('2.5');
+        $result = $this->unitUnderTest->serialize($a);
+        $expectedString = '{"id":1,"name":"name"}';
+        $this->assertEquals($expectedString, $result);
+
+        $this->unitUnderTest->setVersion('1.5');
+        $result = $this->unitUnderTest->serialize($a);
+        $expectedString = '{"id":1,"name":"name","status":true}';
+        $this->assertEquals($expectedString, $result);
+
+        $this->unitUnderTest->setVersion(null);
+        $result = $this->unitUnderTest->serialize($a);
+        $expectedString = '{"id":1,"name":"name","status":true}';
         $this->assertEquals($expectedString, $result);
     }
 
@@ -107,6 +161,122 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $arrayAssoc['tr']);
         $this->assertInstanceOf('\DateTime', $result->getObject()->getDateTime());
         $this->assertEquals($testTime->format(\DateTime::ISO8601), $result->getObject()->getDateTime()->format(DateTime::ISO8601));
+
+        $this->assertEquals(1, $objects[0]->getRid());
+        $this->assertEquals('name', $objects[0]->getName());
+        $this->assertTrue($objects[0]->getStatus());
+        $this->assertNull($objects[0]->getHiddenStatus());
+        $this->assertEquals(3.23, $objects[0]->getFloat());
+        $this->assertNull($objects[0]->getNull());
+        $arrayA = $objects[0]->getArray();
+        $this->assertCount(2, $arrayA);
+        $this->assertEquals(3, $arrayA[0]);
+        $this->assertNull($arrayA[1]);
+        $arrayAssoc = $objects[0]->getAssocArray();
+        $this->assertCount(1, $arrayAssoc);
+        $this->assertArrayHasKey('tr', $arrayAssoc);
+        $this->assertEquals(2, $arrayAssoc['tr']);
+        $this->assertInstanceOf('\DateTime', $objects[0]->getDateTime());
+        $this->assertEquals($testTime->format(\DateTime::ISO8601), $objects[0]->getDateTime()->format(DateTime::ISO8601));
+    }
+
+    public function testUnserializeGroup()
+    {
+        $data = '{"id":1,"name":"name","status":true}';
+        $emptyObject = new A();
+
+        $this->unitUnderTest->setGroups(array('test'));
+        $result = $this->unitUnderTest->unserialize($data, $emptyObject);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertNull($result->getRid());
+        $this->assertNull($result->getName());
+        $this->assertNull($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+
+        $this->unitUnderTest->setGroups(array('get'));
+        $result = $this->unitUnderTest->unserialize($data, $emptyObject);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertNull($result->getRid());
+        $this->assertNull($result->getName());
+        $this->assertTrue($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+
+        $this->unitUnderTest->setGroups(array());
+        $result = $this->unitUnderTest->unserialize($data, $emptyObject);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(1, $result->getRid());
+        $this->assertEquals('name', $result->getName());
+        $this->assertTrue($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+    }
+
+    public function testUnserializeVersion()
+    {
+        $data = '{"id":1,"name":"name","status":true}';
+        $emptyObject = new A();
+
+        $this->unitUnderTest->setVersion('0.5');
+        $result = $this->unitUnderTest->unserialize($data, $emptyObject);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(1, $result->getRid());
+        $this->assertEquals('name', $result->getName());
+        $this->assertNull($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+
+        $this->unitUnderTest->setVersion('2.5');
+        $result = $this->unitUnderTest->unserialize($data, $emptyObject);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(1, $result->getRid());
+        $this->assertEquals('name', $result->getName());
+        $this->assertNull($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+
+        $this->unitUnderTest->setVersion('1.5');
+        $result = $this->unitUnderTest->unserialize($data, $emptyObject);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(1, $result->getRid());
+        $this->assertEquals('name', $result->getName());
+        $this->assertTrue($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+
+        $this->unitUnderTest->setVersion(null);
+        $result = $this->unitUnderTest->unserialize($data, $emptyObject);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(1, $result->getRid());
+        $this->assertEquals('name', $result->getName());
+        $this->assertTrue($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+    }
+
+    public function testUnserializeArray()
+    {
+        $time = time();
+        $testTime = new \DateTime(date('Y-m-d H:i:s', $time));
+        $data = '[{"rid":3,"object":{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}},"arrayOfObjects":[{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}}]}]';
+        $emptyObject = new E();
+        $result = $this->unitUnderTest->unserialize($data, array($emptyObject));
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E', $result[0]);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren', $result[0]->getObject());
+        $objects = $result[0]->getArrayOfObjects();
+        $this->assertCount(1, $objects);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren', $objects[0]);
+        $this->assertEquals(3, $result[0]->getRid());
+        $this->assertEquals(1, $result[0]->getObject()->getRid());
+        $this->assertEquals('name', $result[0]->getObject()->getName());
+        $this->assertTrue($result[0]->getObject()->getStatus());
+        $this->assertNull($result[0]->getObject()->getHiddenStatus());
+        $this->assertEquals(3.23, $result[0]->getObject()->getFloat());
+        $this->assertNull($result[0]->getObject()->getNull());
+        $arrayA = $result[0]->getObject()->getArray();
+        $this->assertCount(2, $arrayA);
+        $this->assertEquals(3, $arrayA[0]);
+        $this->assertNull($arrayA[1]);
+        $arrayAssoc = $result[0]->getObject()->getAssocArray();
+        $this->assertCount(1, $arrayAssoc);
+        $this->assertArrayHasKey('tr', $arrayAssoc);
+        $this->assertEquals(2, $arrayAssoc['tr']);
+        $this->assertInstanceOf('\DateTime', $result[0]->getObject()->getDateTime());
+        $this->assertEquals($testTime->format(\DateTime::ISO8601), $result[0]->getObject()->getDateTime()->format(DateTime::ISO8601));
 
         $this->assertEquals(1, $objects[0]->getRid());
         $this->assertEquals('name', $objects[0]->getName());

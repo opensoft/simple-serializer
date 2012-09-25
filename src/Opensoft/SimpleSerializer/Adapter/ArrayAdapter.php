@@ -16,6 +16,7 @@ use Opensoft\SimpleSerializer\Exception\InvalidArgumentException;
 use Opensoft\SimpleSerializer\Exception\RecursionException;
 use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
+use Opensoft\SimpleSerializer\Exclusion\ExclusionStrategyInterface;
 use DateTime;
 
 /**
@@ -30,6 +31,11 @@ class ArrayAdapter implements BaseArrayAdapter
      * @var MetadataFactory
      */
     private $metadataFactory;
+
+    /**
+     * @var ExclusionStrategyInterface|null
+     */
+    private $exclusionStrategy;
 
     /**
      * @param MetadataFactory $metadataFactory
@@ -51,7 +57,7 @@ class ArrayAdapter implements BaseArrayAdapter
         $className = $this->getFullClassName($object);
         $metadata = $this->metadataFactory->getMetadataForClass($className);
         foreach ($metadata->getProperties() as $property) {
-            if (!$property->isExpose()) {
+            if (!$property->isExpose() || ($this->exclusionStrategy !== null && $this->exclusionStrategy->shouldSkipProperty($property))) {
                 continue;
             }
 
@@ -79,7 +85,8 @@ class ArrayAdapter implements BaseArrayAdapter
         $className = $this->getFullClassName($object);
         $metadata = $this->metadataFactory->getMetadataForClass($className);
         foreach ($metadata->getProperties() as $property) {
-            if (!$property->isExpose() || !array_key_exists($property->getSerializedName(), $data)) {
+            if (!$property->isExpose() || ($this->exclusionStrategy !== null && $this->exclusionStrategy->shouldSkipProperty($property))
+                || !array_key_exists($property->getSerializedName(), $data)) {
                 continue;
             }
             $value = $this->handleValue($data[$property->getSerializedName()], $property, self::DIRECTION_UNSERIALIZE, $object);
@@ -92,6 +99,19 @@ class ArrayAdapter implements BaseArrayAdapter
         }
 
         return $object;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param ExclusionStrategyInterface|null $exclusionStrategy
+     * @return ArrayAdapterInterface
+     */
+    public function setExclusionStrategy(ExclusionStrategyInterface $exclusionStrategy = null)
+    {
+        $this->exclusionStrategy = $exclusionStrategy;
+
+        return $this;
     }
 
     /**

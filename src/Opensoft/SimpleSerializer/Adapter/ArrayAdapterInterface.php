@@ -11,6 +11,8 @@
 
 namespace Opensoft\SimpleSerializer\Adapter;
 
+use Opensoft\SimpleSerializer\Exclusion\ExclusionStrategyInterface;
+
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  */
@@ -33,4 +35,12 @@ interface ArrayAdapterInterface
      * @param object $object
      */
     public function toObject(array $data, $object);
+
+    /**
+     * Sets ExclusionStrategy
+     *
+     * @param ExclusionStrategyInterface|null $exclusionStrategy
+     * @return ArrayAdapterInterface
+     */
+    public function setExclusionStrategy(ExclusionStrategyInterface $exclusionStrategy = null);
 }

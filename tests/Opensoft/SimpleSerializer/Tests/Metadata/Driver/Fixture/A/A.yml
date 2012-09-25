@@ -10,5 +10,11 @@ Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A:
         status:
             type: boolean
             expose: true
+            since_version: 1.1
+            until_version: 2.1
+            groups: [post, patch, get]
         hiddenStatus:
             type: boolean
+            since_version: 1.1
+            until_version: 2.1
+            groups: [post, patch, get]

@@ -55,17 +55,29 @@ class YamlDriver extends FileDriverAbstract
         $metadata->addFileResource($file);
         foreach ($config['properties'] as $propertyName => $propertyOptions) {
             $pMetadata = new PropertyMetadata($propertyName);
-                if (isset($propertyOptions['expose'])) {
-                    $pMetadata->setExpose((boolean) $propertyOptions['expose']);
-                }
+            if (isset($propertyOptions['expose'])) {
+                $pMetadata->setExpose((boolean) $propertyOptions['expose']);
+            }
 
-                if (isset($propertyOptions['serialized_name'])) {
-                    $pMetadata->setSerializedName((string) $propertyOptions['serialized_name']);
-                }
+            if (isset($propertyOptions['serialized_name'])) {
+                $pMetadata->setSerializedName((string) $propertyOptions['serialized_name']);
+            }
 
-                if (isset($propertyOptions['type'])) {
-                    $pMetadata->setType((string) $propertyOptions['type']);
-                }
+            if (isset($propertyOptions['since_version'])) {
+                $pMetadata->setSinceVersion((string) $propertyOptions['since_version']);
+            }
+
+            if (isset($propertyOptions['until_version'])) {
+                $pMetadata->setUntilVersion((string) $propertyOptions['until_version']);
+            }
+
+            if (isset($propertyOptions['type'])) {
+                $pMetadata->setType((string) $propertyOptions['type']);
+            }
+
+            if (isset($propertyOptions['groups'])) {
+                $pMetadata->setGroups($propertyOptions['groups']);
+            }
             $metadata->addPropertyMetadata($pMetadata);
         }
 

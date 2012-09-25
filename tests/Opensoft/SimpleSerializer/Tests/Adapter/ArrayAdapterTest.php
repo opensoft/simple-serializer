@@ -19,6 +19,8 @@ use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\Recursion;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\DateTime as TestDateTime;
 use Opensoft\SimpleSerializer\Adapter\ArrayAdapterInterface;
 use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
+use Opensoft\SimpleSerializer\Exclusion\GroupsExclusionStrategy;
+use Opensoft\SimpleSerializer\Exclusion\VersionExclusionStrategy;
 use DateTime;
 
 /**
@@ -121,6 +123,80 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $objectComplex = new Recursion();
         $objectComplex->setObject($objectComplex);
         $this->unitUnderTest->toArray($objectComplex);
+    }
+
+    public function testToArrayGroup()
+    {
+        $object = new A();
+        $object->setRid(2)
+            ->setName('testName')
+            ->setStatus(true)
+            ->setHiddenStatus(false);
+
+        $this->unitUnderTest->setExclusionStrategy(new GroupsExclusionStrategy(array('support')));
+        $result = $this->unitUnderTest->toArray($object);
+        $this->assertCount(0, $result);
+
+        $this->unitUnderTest->setExclusionStrategy(new GroupsExclusionStrategy(array('get')));
+        $result = $this->unitUnderTest->toArray($object);
+        $this->assertCount(1, $result);
+        $this->assertArrayHasKey('status', $result);
+        $this->assertTrue($result['status']);
+
+
+        $this->unitUnderTest->setExclusionStrategy(null);
+        $result = $this->unitUnderTest->toArray($object);
+        $this->assertCount(3, $result);
+        $this->assertArrayHasKey('id', $result);
+        $this->assertArrayHasKey('name', $result);
+        $this->assertArrayHasKey('status', $result);
+        $this->assertEquals(2, $result['id']);
+        $this->assertEquals('testName', $result['name']);
+        $this->assertTrue($result['status']);
+    }
+
+    public function testToArrayVersion()
+    {
+        $object = new A();
+        $object->setRid(2)
+            ->setName('testName')
+            ->setStatus(true)
+            ->setHiddenStatus(false);
+
+        $this->unitUnderTest->setExclusionStrategy(new VersionExclusionStrategy('0.5'));
+        $result = $this->unitUnderTest->toArray($object);
+        $this->assertCount(2, $result);
+        $this->assertArrayHasKey('id', $result);
+        $this->assertArrayHasKey('name', $result);
+        $this->assertEquals(2, $result['id']);
+        $this->assertEquals('testName', $result['name']);
+
+        $this->unitUnderTest->setExclusionStrategy(new VersionExclusionStrategy('2.5'));
+        $result = $this->unitUnderTest->toArray($object);
+        $this->assertCount(2, $result);
+        $this->assertArrayHasKey('id', $result);
+        $this->assertArrayHasKey('name', $result);
+        $this->assertEquals(2, $result['id']);
+        $this->assertEquals('testName', $result['name']);
+
+        $this->unitUnderTest->setExclusionStrategy(new VersionExclusionStrategy('1.5'));
+        $result = $this->unitUnderTest->toArray($object);
+        $this->assertCount(3, $result);
+        $this->assertArrayHasKey('id', $result);
+        $this->assertArrayHasKey('name', $result);
+        $this->assertEquals(2, $result['id']);
+        $this->assertEquals('testName', $result['name']);
+
+
+        $this->unitUnderTest->setExclusionStrategy(null);
+        $result = $this->unitUnderTest->toArray($object);
+        $this->assertCount(3, $result);
+        $this->assertArrayHasKey('id', $result);
+        $this->assertArrayHasKey('name', $result);
+        $this->assertArrayHasKey('status', $result);
+        $this->assertEquals(2, $result['id']);
+        $this->assertEquals('testName', $result['name']);
+        $this->assertTrue($result['status']);
     }
 
     /**
@@ -250,6 +326,84 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(23, $objects[0]->getName());
         $this->assertNull($objects[0]->getFloat());
         $this->assertTrue($objects[0]->getHiddenStatus());
+    }
+
+    public function testToObjectGroup()
+    {
+        $object = new A();
+        $array = array(
+            'id' => 3,
+            'name' => 'test',
+            'status' => true,
+            'hiddenStatus' => false
+        );
+
+        $this->unitUnderTest->setExclusionStrategy(new GroupsExclusionStrategy(array('support')));
+        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertNull($result->getRid());
+        $this->assertNull($result->getName());
+        $this->assertNull($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+
+        $this->unitUnderTest->setExclusionStrategy(new GroupsExclusionStrategy(array('get')));
+        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertNull($result->getRid());
+        $this->assertNull($result->getName());
+        $this->assertTrue($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+
+        $this->unitUnderTest->setExclusionStrategy(null);
+        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(3, $result->getRid());
+        $this->assertEquals('test', $result->getName());
+        $this->assertTrue($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+    }
+
+    public function testToObjectVersion()
+    {
+        $object = new A();
+        $array = array(
+            'id' => 3,
+            'name' => 'test',
+            'status' => true,
+            'hiddenStatus' => false
+        );
+
+        $this->unitUnderTest->setExclusionStrategy(new VersionExclusionStrategy('0.5'));
+        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(3, $result->getRid());
+        $this->assertEquals('test', $result->getName());
+        $this->assertNull($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+
+        $this->unitUnderTest->setExclusionStrategy(new VersionExclusionStrategy('2.5'));
+        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(3, $result->getRid());
+        $this->assertEquals('test', $result->getName());
+        $this->assertNull($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+
+        $this->unitUnderTest->setExclusionStrategy(new VersionExclusionStrategy('1.5'));
+        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(3, $result->getRid());
+        $this->assertEquals('test', $result->getName());
+        $this->assertTrue($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+
+        $this->unitUnderTest->setExclusionStrategy(null);
+        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(3, $result->getRid());
+        $this->assertEquals('test', $result->getName());
+        $this->assertTrue($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
     }
 
     /**

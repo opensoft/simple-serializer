@@ -39,6 +39,21 @@ class PropertyMetadata implements Serializable
     protected $expose = false;
 
     /**
+     * @var array
+     */
+    protected $groups = array();
+
+    /**
+     * @var string
+     */
+    protected $sinceVersion;
+
+    /**
+     * @var string
+     */
+    protected $untilVersion;
+
+    /**
      * @param string $name
      */
     public function __construct($name)
@@ -113,6 +128,63 @@ class PropertyMetadata implements Serializable
     }
 
     /**
+     * @param array $groups
+     * @return PropertyMetadata
+     */
+    public function setGroups(array $groups)
+    {
+        $this->groups = $groups;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getGroups()
+    {
+        return $this->groups;
+    }
+
+    /**
+     * @param string $sinceVersion
+     * @return PropertyMetadata
+     */
+    public function setSinceVersion($sinceVersion)
+    {
+        $this->sinceVersion = $sinceVersion;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSinceVersion()
+    {
+        return $this->sinceVersion;
+    }
+
+    /**
+     * @param string $untilVersion
+     * @return PropertyMetadata
+     */
+    public function setUntilVersion($untilVersion)
+    {
+        $this->untilVersion = $untilVersion;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUntilVersion()
+    {
+        return $this->untilVersion;
+    }
+
+    /**
      * @return string
      */
     public function serialize()
@@ -121,7 +193,10 @@ class PropertyMetadata implements Serializable
             $this->name,
             $this->type,
             $this->serializedName,
-            $this->expose
+            $this->expose,
+            $this->groups,
+            $this->sinceVersion,
+            $this->untilVersion
         ));
     }
 
@@ -131,7 +206,7 @@ class PropertyMetadata implements Serializable
      */
     public function unserialize($str)
     {
-        list($this->name, $this->type, $this->serializedName, $this->expose) = unserialize($str);
+        list($this->name, $this->type, $this->serializedName, $this->expose, $this->groups, $this->sinceVersion, $this->untilVersion) = unserialize($str);
 
         return $this;
     }

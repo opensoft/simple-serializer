@@ -13,6 +13,8 @@ namespace Opensoft\SimpleSerializer;
 
 use Opensoft\SimpleSerializer\Adapter\SerializerAdapterInterface;
 use Opensoft\SimpleSerializer\Adapter\ArrayAdapterInterface;
+use Opensoft\SimpleSerializer\Exclusion\VersionExclusionStrategy;
+use Opensoft\SimpleSerializer\Exclusion\GroupsExclusionStrategy;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
@@ -30,10 +32,10 @@ class Serializer
     private $serializerAdapter;
 
     /**
-     * @param $arrayAdapter
-     * @param $serializerAdapter
+     * @param ArrayAdapterInterface $arrayAdapter
+     * @param SerializerAdapterInterface $serializerAdapter
      */
-    public function __construct($arrayAdapter, $serializerAdapter)
+    public function __construct(ArrayAdapterInterface $arrayAdapter, SerializerAdapterInterface $serializerAdapter)
     {
         $this->arrayAdapter = $arrayAdapter;
         $this->serializerAdapter = $serializerAdapter;
@@ -60,13 +62,51 @@ class Serializer
 
     /**
      * @param string $data
-     * @param object $object
-     * @return object string
+     * @param object|array $object
+     * @return object|array
      */
     public function unserialize($data, $object)
     {
         $array = $this->serializerAdapter->unserialize($data);
+        if (is_array($object)) {
+            $result = array();
+            foreach ($array as $key => $item) {
+                $result[] = $this->arrayAdapter->toObject($item, $object[$key]);
+            }
+
+            return $result;
+        }
 
         return $this->arrayAdapter->toObject($array, $object);
+    }
+
+    /**
+     * @param string $version
+     * @return bool
+     */
+    public function setVersion($version)
+    {
+        if (null === $version) {
+            $this->arrayAdapter->setExclusionStrategy(null);
+
+            return false;
+        }
+
+        $this->arrayAdapter->setExclusionStrategy(new VersionExclusionStrategy($version));
+    }
+
+    /**
+     * @param array $groups
+     * @return bool
+     */
+    public function setGroups(array $groups)
+    {
+        if (!$groups) {
+            $this->arrayAdapter->setExclusionStrategy(null);
+
+            return false;
+        }
+
+        $this->arrayAdapter->setExclusionStrategy(new GroupsExclusionStrategy($groups));
     }
 }
