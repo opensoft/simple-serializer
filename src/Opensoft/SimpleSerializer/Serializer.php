@@ -111,10 +111,10 @@ class Serializer
     }
 
     /**
-     * @param $strictUnserializeMode
+     * @param integer $unserializeMode
      */
-    public function setStrictUnserializeMode($strictUnserializeMode)
+    public function setUnserializeMode($unserializeMode)
     {
-        $this->arrayAdapter->setStrictUnserializeMode($strictUnserializeMode);
+        $this->arrayAdapter->setUnserializeMode($unserializeMode);
     }
 }

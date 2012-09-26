@@ -26,6 +26,9 @@ class ArrayAdapter implements BaseArrayAdapter
 {
     const DIRECTION_SERIALIZE = 1;
     const DIRECTION_UNSERIALIZE = 0;
+    const STRICT_MODE = 2;
+    const MEDIUM_STRICT_MODE = 1;
+    const NON_STRICT_MODE = 0;
 
     /**
      * @var MetadataFactory
@@ -38,18 +41,18 @@ class ArrayAdapter implements BaseArrayAdapter
     private $exclusionStrategy;
 
     /**
-     * @var boolean
+     * @var integer
      */
-    private $strictUnserializeMode;
+    private $unserializeMode;
 
     /**
      * @param MetadataFactory $metadataFactory
-     * @param boolean $strictUnserializeMode
+     * @param int $unserializeMode
      */
-    public function __construct(MetadataFactory $metadataFactory, $strictUnserializeMode = false)
+    public function __construct(MetadataFactory $metadataFactory, $unserializeMode = self::NON_STRICT_MODE)
     {
         $this->metadataFactory = $metadataFactory;
-        $this->strictUnserializeMode = $strictUnserializeMode;
+        $this->setUnserializeMode($unserializeMode);
     }
 
     /**
@@ -94,7 +97,7 @@ class ArrayAdapter implements BaseArrayAdapter
         $unserializedProperties = 0;
         foreach ($metadata->getProperties() as $property) {
             if (!$property->isExpose() || ($this->exclusionStrategy !== null && $this->exclusionStrategy->shouldSkipProperty($property))) {
-                if ($this->isStrictUnserializeMode() && array_key_exists($property->getSerializedName(), $data)) {
+                if ($this->isMediumStrictUnserializeMode() && array_key_exists($property->getSerializedName(), $data)) {
                     throw new InvalidArgumentException(sprintf('%s extra field', $property->getSerializedName()));
                 }
                 continue;
@@ -116,7 +119,7 @@ class ArrayAdapter implements BaseArrayAdapter
             $unserializedProperties ++;
         }
 
-        if ($this->isStrictUnserializeMode() && $unserializedProperties !== count($data)) {
+        if ($this->isMediumStrictUnserializeMode() && $unserializedProperties !== count($data)) {
             throw new InvalidArgumentException('Wrong number of fields in the deserialized data');
         }
 
@@ -139,11 +142,22 @@ class ArrayAdapter implements BaseArrayAdapter
     /**
      * {@inheritDoc}
      *
-     * @param boolean $strictUnserializeMode
+     * @param boolean $unserializeMode
+     * @return ArrayAdapterInterface
      */
-    public function setStrictUnserializeMode($strictUnserializeMode)
+    public function setUnserializeMode($unserializeMode)
     {
-        $this->strictUnserializeMode = (bool) $strictUnserializeMode;
+        switch ($unserializeMode) {
+            case self::STRICT_MODE:
+            case self::MEDIUM_STRICT_MODE:
+            case self::NON_STRICT_MODE:
+                $this->unserializeMode = $unserializeMode;
+                break;
+            default:
+                new InvalidArgumentException(sprintf('Non acceptable unserialize mode: "%s"', $unserializeMode));
+        }
+
+        return $this;
     }
 
     /**
@@ -151,7 +165,15 @@ class ArrayAdapter implements BaseArrayAdapter
      */
     private function isStrictUnserializeMode()
     {
-        return $this->strictUnserializeMode;
+        return $this->unserializeMode === self::STRICT_MODE;
+    }
+
+    /**
+     * @return boolean
+     */
+    private function isMediumStrictUnserializeMode()
+    {
+        return $this->unserializeMode >= self::MEDIUM_STRICT_MODE;
     }
 
     /**

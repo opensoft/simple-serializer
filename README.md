@@ -12,7 +12,13 @@ Built-in features include:
 - (de-)serialize object graphs
 - supports boolean, integer, double, DateTime\<format\>, array, T, array\<T\>, null types, where "T" - is some PHP object.
 - configurable via YAML
-- strict unserialize mode (default false)
+- three unserialize mode (non-strict, medium strict, strict)
+
+Unserialize mode:
+Non-Strict mode - serializer does not check incoming parameters
+Medium Strict - serializer extra check incoming parameters and if they exist throw InvalidArgumentException
+Strict - serializer extra check incoming parameters completely as expected if there are extra arguments or missing some, it throws an exception.
+
 
 Some Restrictions:
 
@@ -132,6 +138,12 @@ example, when accepting data via an API.
     $serializer->setVersion('1.0');
     $object = $serializer->unserialize($jsonData, $object);
     //Strict unserialize mode
-    $serializer->setStrictUnserializeMode(true);
+    $serializer->setStrictUnserializeMode(2);
+    $object = $serializer->unserialize($jsonData, $object);
+    //Medium Strict unserialize mode
+    $serializer->setStrictUnserializeMode(1);
+    $object = $serializer->unserialize($jsonData, $object);
+    //Non-Strict unserialize mode
+    $serializer->setStrictUnserializeMode(0);
     $object = $serializer->unserialize($jsonData, $object);
 ```

@@ -47,7 +47,8 @@ interface ArrayAdapterInterface
     /**
      * Sets Unserialized mode
      *
-     * @param boolean $strictUnserializeMode
+     * @param boolean $unserializeMode
+     * @return ArrayAdapterInterface
      */
-    public function setStrictUnserializeMode($strictUnserializeMode);
+    public function setUnserializeMode($unserializeMode);
 }

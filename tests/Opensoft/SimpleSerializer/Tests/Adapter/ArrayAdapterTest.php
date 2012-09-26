@@ -406,12 +406,30 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($result->getHiddenStatus());
     }
 
+    public function testNonStrictUnserializeHasExtraFields()
+    {
+        $this->unitUnderTest->setUnserializeMode(0);
+        $object = new A();
+        $array = array(
+            'id' => 3,
+            'name' => 'test',
+            'status' => true,
+            'hiddenStatus' => false
+        );
+        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(3, $result->getRid());
+        $this->assertEquals('test', $result->getName());
+        $this->assertTrue($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+    }
+
     /**
      * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
      */
-    public function testStrictUnserializeHasExtraFields()
+    public function testMediumStrictUnserializeHasExtraFields()
     {
-        $this->unitUnderTest->setStrictUnserializeMode(true);
+        $this->unitUnderTest->setUnserializeMode(1);
         $object = new A();
         $array = array(
             'id' => 3,
@@ -425,9 +443,57 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
      */
+    public function testStrictUnserializeHasExtraFields()
+    {
+        $this->unitUnderTest->setUnserializeMode(2);
+        $object = new A();
+        $array = array(
+            'id' => 3,
+            'name' => 'test',
+            'status' => true,
+            'hiddenStatus' => false
+        );
+        $this->unitUnderTest->toObject($array, $object);
+    }
+
+    public function testNonStrictUnserializeLostField()
+    {
+        $this->unitUnderTest->setUnserializeMode(0);
+        $object = new A();
+        $array = array(
+            'id' => 3,
+            'name' => 'test'
+        );
+        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(3, $result->getRid());
+        $this->assertEquals('test', $result->getName());
+        $this->assertNull($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+    }
+
+    public function testMedimStrictUnserializeLostField()
+    {
+        $this->unitUnderTest->setUnserializeMode(1);
+        $object = new A();
+        $array = array(
+            'id' => 3,
+            'name' => 'test'
+        );
+        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(3, $result->getRid());
+        $this->assertEquals('test', $result->getName());
+        $this->assertNull($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+    }
+
+    /**
+     * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
+     */
     public function testStrictUnserializeLostField()
     {
-        $this->unitUnderTest->setStrictUnserializeMode(true);
+        $this->unitUnderTest->setUnserializeMode(2);
         $object = new A();
         $array = array(
             'id' => 3,
@@ -437,12 +503,46 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $this->unitUnderTest->toObject($array, $object);
     }
 
+    public function testNonStrictUnserializeWrongNumberOfFields()
+    {
+        $this->unitUnderTest->setUnserializeMode(0);
+        $object = new A();
+        $array = array(
+            'id' => 3,
+            'name' => 'test',
+            'status' => true,
+            'HAHA' => false
+        );
+        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(3, $result->getRid());
+        $this->assertEquals('test', $result->getName());
+        $this->assertTrue($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+    }
+
     /**
      * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
      */
     public function testStrictUnserializeWrongNumberOfFields()
     {
-        $this->unitUnderTest->setStrictUnserializeMode(true);
+        $this->unitUnderTest->setUnserializeMode(2);
+        $object = new A();
+        $array = array(
+            'id' => 3,
+            'name' => 'test',
+            'status' => true,
+            'HAHA' => false
+        );
+        $this->unitUnderTest->toObject($array, $object);
+    }
+
+    /**
+     * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
+     */
+    public function testMediumStrictUnserializeWrongNumberOfFields()
+    {
+        $this->unitUnderTest->setUnserializeMode(1);
         $object = new A();
         $array = array(
             'id' => 3,

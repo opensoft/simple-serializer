@@ -301,12 +301,68 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $data = '{"id":1,"name":"name","status":true}';
         $emptyObject = new A();
 
-        $this->unitUnderTest->setStrictUnserializeMode(true);
+        $this->unitUnderTest->setUnserializeMode(2);
         $result = $this->unitUnderTest->unserialize($data, $emptyObject);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
         $this->assertEquals(1, $result->getRid());
         $this->assertEquals('name', $result->getName());
         $this->assertTrue($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+    }
+
+    public function testNonStrictUnserialize()
+    {
+        $data = '{"id":1,"name":"name","status":true}';
+        $emptyObject = new A();
+
+        $this->unitUnderTest->setUnserializeMode(0);
+        $result = $this->unitUnderTest->unserialize($data, $emptyObject);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(1, $result->getRid());
+        $this->assertEquals('name', $result->getName());
+        $this->assertTrue($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+    }
+
+    public function testMediumStrictUnserialize()
+    {
+        $data = '{"id":1,"name":"name","status":true}';
+        $emptyObject = new A();
+
+        $this->unitUnderTest->setUnserializeMode(1);
+        $result = $this->unitUnderTest->unserialize($data, $emptyObject);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(1, $result->getRid());
+        $this->assertEquals('name', $result->getName());
+        $this->assertTrue($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+    }
+
+    public function testNonStrictUnserializeFailed()
+    {
+        $data = '{"id":1,"name":"name"}';
+        $emptyObject = new A();
+
+        $this->unitUnderTest->setUnserializeMode(0);
+        $result = $this->unitUnderTest->unserialize($data, $emptyObject);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(1, $result->getRid());
+        $this->assertEquals('name', $result->getName());
+        $this->assertNull($result->getStatus());
+        $this->assertNull($result->getHiddenStatus());
+    }
+
+    public function testMediumStrictUnserializeFailed()
+    {
+        $data = '{"id":1,"name":"name"}';
+        $emptyObject = new A();
+
+        $this->unitUnderTest->setUnserializeMode(1);
+        $result = $this->unitUnderTest->unserialize($data, $emptyObject);
+        $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
+        $this->assertEquals(1, $result->getRid());
+        $this->assertEquals('name', $result->getName());
+        $this->assertNull($result->getStatus());
         $this->assertNull($result->getHiddenStatus());
     }
 
@@ -318,7 +374,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $data = '{"id":1,"name":"name"}';
         $emptyObject = new A();
 
-        $this->unitUnderTest->setStrictUnserializeMode(true);
+        $this->unitUnderTest->setUnserializeMode(2);
         $this->unitUnderTest->unserialize($data, $emptyObject);
     }
 
