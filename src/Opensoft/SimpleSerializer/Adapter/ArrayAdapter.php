@@ -222,7 +222,11 @@ class ArrayAdapter implements BaseArrayAdapter
                     }
                     $value = $value->format($dateTimeFormat);
                 } elseif ($direct == self::DIRECTION_UNSERIALIZE) {
-                    $value = new DateTime($value);
+                    try {
+                        $value = new DateTime($value);
+                    } catch (\Exception $e) {
+                        throw new InvalidArgumentException(sprintf('Invalid DateTime argument "%s"', $value), $e->getCode(), $e);
+                    }
                 }
             } elseif ($type === 'array' || ($type[0] === 'a' && strpos($type, 'array<') === 0)) {
                 $tmpResult = array();

@@ -443,6 +443,21 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
      */
+    public function testUnserializeWithInvalidDateTimeArgument()
+    {
+        $object = new AChildren();
+        $array = array(
+            'id' => 3,
+            'name' => 'test',
+            'status' => true,
+            'dateTime' => 'ssss'
+        );
+        $this->unitUnderTest->toObject($array, $object);
+    }
+
+    /**
+     * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
+     */
     public function testStrictUnserializeHasExtraFields()
     {
         $this->unitUnderTest->setUnserializeMode(2);
