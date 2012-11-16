@@ -143,6 +143,7 @@ class ArrayAdapter implements BaseArrayAdapter
      * {@inheritDoc}
      *
      * @param boolean $unserializeMode
+     * @throws InvalidArgumentException
      * @return ArrayAdapterInterface
      */
     public function setUnserializeMode($unserializeMode)
@@ -154,7 +155,7 @@ class ArrayAdapter implements BaseArrayAdapter
                 $this->unserializeMode = $unserializeMode;
                 break;
             default:
-                new InvalidArgumentException(sprintf('Non acceptable unserialize mode: "%s"', $unserializeMode));
+                throw new InvalidArgumentException(sprintf('Non acceptable unserialize mode: "%s"', $unserializeMode));
         }
 
         return $this;

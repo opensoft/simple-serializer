@@ -12,6 +12,7 @@
 namespace Opensoft\SimpleSerializer\Adapter;
 
 use Opensoft\SimpleSerializer\Adapter\SerializerAdapterInterface;
+use Opensoft\SimpleSerializer\Exception\UnserializedException;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
@@ -19,20 +20,26 @@ use Opensoft\SimpleSerializer\Adapter\SerializerAdapterInterface;
 class JsonAdapter implements SerializerAdapterInterface
 {
     /**
-     * @param array $data
+     * @param mixed $data
      * @return mixed|string
      */
-    public function serialize(array $data)
+    public function serialize($data)
     {
         return json_encode($data);
     }
 
     /**
      * @param mixed $data
+     * @throws UnserializedException
      * @return mixed
      */
     public function unserialize($data)
     {
-        return json_decode($data, true);
+        $result = json_decode($data, true);
+        if ($result === null && strtolower($data) !== "null") {
+            throw new UnserializedException('JSON cannot be decoded');
+        }
+
+        return $result;
     }
 }

@@ -64,6 +64,8 @@ class JsonAdapterTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('[]', array()),
+            array('null', null),
+            array('"null"', 'null'),
             array('[1]', array(1)),
             array('{"true":true}', array('true' => true)),
             array('{"false":false}', array('false' => false)),
@@ -72,6 +74,15 @@ class JsonAdapterTest extends \PHPUnit_Framework_TestCase
             array('{"emptyString":""}', array('emptyString' => '')),
             array('{"nestedArray":{"test":"nestedTest"}}', array('nestedArray' => array('test' => 'nestedTest')))
         );
+    }
+
+    /**
+     * @return array
+     * @expectedException \Opensoft\SimpleSerializer\Exception\UnserializedException
+     */
+    public function testUnserializedException()
+    {
+        $this->mockAdapter->unserialize('{"wrongJson":"}');
     }
 
     protected function setUp()

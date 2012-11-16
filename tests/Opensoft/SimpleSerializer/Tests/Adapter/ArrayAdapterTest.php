@@ -569,6 +569,14 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
+     */
+    public function testNonAcceptableUnserializeMode()
+    {
+        $this->unitUnderTest->setUnserializeMode(5);
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected function setUp()

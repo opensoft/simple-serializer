@@ -11,8 +11,9 @@
 
 namespace Opensoft\SimpleSerializer;
 
-use Opensoft\SimpleSerializer\Adapter\SerializerAdapterInterface;
 use Opensoft\SimpleSerializer\Adapter\ArrayAdapterInterface;
+use Opensoft\SimpleSerializer\Adapter\SerializerAdapterInterface;
+use Opensoft\SimpleSerializer\Exception\InvalidArgumentException;
 use Opensoft\SimpleSerializer\Exclusion\VersionExclusionStrategy;
 use Opensoft\SimpleSerializer\Exclusion\GroupsExclusionStrategy;
 
@@ -32,6 +33,11 @@ class Serializer
     private $serializerAdapter;
 
     /**
+     * @var boolean
+     */
+    private $level = 0;
+
+    /**
      * @param ArrayAdapterInterface $arrayAdapter
      * @param SerializerAdapterInterface $serializerAdapter
      */
@@ -42,42 +48,62 @@ class Serializer
     }
 
     /**
-     * @param object|array $objects
+     * @param object|array $data
      * @return string
      */
-    public function serialize($objects)
+    public function serialize($data)
     {
-        $dataAsArray = array();
-        if (is_array($objects)) {
-            foreach ($objects as $object) {
-                $dataAsArray[] = $this->arrayAdapter->toArray($object);
+        $this->level++;
+        $dataAsArray = null;
+        if (is_array($data)) {
+            foreach ($data as $key => $object) {
+                $dataAsArray[$key] = $this->serialize($object);
             }
+        } else if (is_object($data)) {
+            $dataAsArray = $this->arrayAdapter->toArray($data);
         } else {
-            $dataAsArray = $this->arrayAdapter->toArray($objects);
+            $dataAsArray = $data;
         }
-
-
-        return $this->serializerAdapter->serialize($dataAsArray);
+        $this->level--;
+        if ($this->level === 0) {
+            return $this->serializerAdapter->serialize($dataAsArray);
+        } else {
+            return $dataAsArray;
+        }
     }
 
     /**
-     * @param string $data
-     * @param object|array $object
+     * @param mixed $data
+     * @param mixed $targetData
+     * @throws InvalidArgumentException
      * @return object|array
      */
-    public function unserialize($data, $object)
+    public function unserialize($data, $targetData = null)
     {
-        $array = $this->serializerAdapter->unserialize($data);
-        if (is_array($object)) {
+        if ($this->level === 0) {
+            $unserializedData = $this->serializerAdapter->unserialize($data);
+        } else {
+            $unserializedData = $data;
+        }
+        if (is_object($targetData)) {
+            return $this->arrayAdapter->toObject($unserializedData, $targetData);
+        } else if (is_array($targetData)) {
+            $this->level++;
             $result = array();
-            foreach ($array as $key => $item) {
-                $result[] = $this->arrayAdapter->toObject($item, $object[$key]);
+            foreach ($unserializedData as $key => $item) {
+                if (array_key_exists($key, $targetData)) {
+                    $value = $targetData[$key];
+                } else {
+                    $value = null;
+                }
+                $result[$key] = $this->unserialize($item, $value);
             }
+            $this->level--;
 
             return $result;
         }
 
-        return $this->arrayAdapter->toObject($array, $object);
+        return $unserializedData;
     }
 
     /**

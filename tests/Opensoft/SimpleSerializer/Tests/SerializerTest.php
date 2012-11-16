@@ -378,6 +378,45 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->unitUnderTest->unserialize($data, $emptyObject);
     }
 
+    /**
+     * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
+     */
+    public function testNonAcceptableUnserializeMode()
+    {
+        $this->unitUnderTest->setUnserializeMode(5);
+    }
+
+    public function testUnserializeSimpleValues()
+    {
+        $data = 'null';
+        $result = $this->unitUnderTest->unserialize($data, null);
+        $this->assertNull($result);
+
+        $data = '"null"';
+        $result = $this->unitUnderTest->unserialize($data, null);
+        $this->assertEquals('null', $result);
+
+        $data = '[null]';
+        $result = $this->unitUnderTest->unserialize($data, null);
+        $this->assertEquals(array(null), $result);
+
+        $data = '[1,2]';
+        $result = $this->unitUnderTest->unserialize($data, array());
+        $this->assertEquals(array(1,2), $result);
+
+        $data = '[1,2]';
+        $result = $this->unitUnderTest->unserialize($data, array(2,1));
+        $this->assertEquals(array(1,2), $result);
+
+        $data = '[[1],2]';
+        $result = $this->unitUnderTest->unserialize($data);
+        $this->assertEquals(array(array(1),2), $result);
+
+        $data = '{"value": 12, "array":[1,2,3]}';
+        $result = $this->unitUnderTest->unserialize($data);
+        $this->assertEquals(array('value' => 12, 'array' => array(1, 2, 3)), $result);
+    }
+
     protected function setUp()
     {
         $locator = $this->getMockForAbstractClass(

@@ -20,10 +20,10 @@ interface SerializerAdapterInterface
      * Serialize an array
      *
      * @abstract
-     * @param array $data
+     * @param mixed $data
      * @return mixed
      */
-    public function serialize(array $data);
+    public function serialize($data);
 
     /**
      * Unserialize an object with data
