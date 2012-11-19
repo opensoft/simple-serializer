@@ -54,6 +54,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $result = $this->unitUnderTest->serialize($e);
         $expectedString = '{"rid":3,"object":{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}},"arrayOfObjects":[{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}}]}';
         $this->assertEquals($expectedString, $result);
+        $this->assertEquals('[]', $this->unitUnderTest->serialize(array()));
     }
 
     public function testSerializeGroup()

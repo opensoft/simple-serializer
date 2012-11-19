@@ -56,6 +56,7 @@ class Serializer
         $this->level++;
         $dataAsArray = null;
         if (is_array($data)) {
+            $dataAsArray = array();
             foreach ($data as $key => $object) {
                 $dataAsArray[$key] = $this->serialize($object);
             }
