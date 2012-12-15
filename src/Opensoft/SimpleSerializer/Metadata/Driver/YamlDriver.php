@@ -40,8 +40,16 @@ use Symfony\Component\Yaml\Yaml;
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class YamlDriver extends FileDriverAbstract
+class YamlDriver extends AbstractFileDriver
 {
+    /**
+     * {@inheritDoc}
+     *
+     * @param string $className
+     * @param string $file
+     * @return null|ClassMetadata
+     * @throws RuntimeException
+     */
     protected function loadMetadataFromFile($className, $file)
     {
         $config = Yaml::parse(file_get_contents($file));
@@ -84,6 +92,11 @@ class YamlDriver extends FileDriverAbstract
         return $metadata;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return string
+     */
     protected function getExtension()
     {
         return 'yml';
