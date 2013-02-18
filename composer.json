@@ -14,9 +14,9 @@
     ],
     "require": {
         "php": ">=5.3.3",
-        "symfony/yaml": "dev-master"
+        "symfony/yaml": ">=2.0.0"
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-0": {
             "Opensoft": "src"
