@@ -16,7 +16,7 @@ namespace Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A;
  */
 class A
 {
-    private $rid;
+    public $rid;
     private $name;
     private $status;
     private $hiddenStatus;

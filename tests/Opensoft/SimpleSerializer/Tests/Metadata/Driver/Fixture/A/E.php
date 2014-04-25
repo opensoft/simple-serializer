@@ -17,7 +17,7 @@ namespace Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A;
 class E
 {
     private $rid;
-    private $object;
+    public $object;
     private $arrayOfObjects;
 
     public function setArrayOfObjects($arrayOfObjects)

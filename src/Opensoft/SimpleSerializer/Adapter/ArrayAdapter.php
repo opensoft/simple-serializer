@@ -71,10 +71,7 @@ class ArrayAdapter implements BaseArrayAdapter
                 continue;
             }
 
-            $value = call_user_func(array($object, 'get' . ucfirst($property->getName())));
-            if ($value === $object) {
-                throw new RecursionException(sprintf('Invalid self reference detected. %s::%s', $className, $property->getName()));
-            }
+            $value = $this->exposeValue($object, $property);
 
             $value = $this->handleValue($value, $property, self::DIRECTION_SERIALIZE);
 
@@ -115,7 +112,7 @@ class ArrayAdapter implements BaseArrayAdapter
                 throw new RecursionException(sprintf('Invalid self reference detected. %s::%s', $className, $property->getName()));
             }
 
-            call_user_func_array(array($object, 'set' . ucfirst($property->getName())), array($value));
+            $this->involveValue($object, $property, $value);
             $unserializedProperties ++;
         }
 
@@ -269,5 +266,44 @@ class ArrayAdapter implements BaseArrayAdapter
         }
 
         return $value;
+    }
+
+    /**
+     * @todo should be refactor
+     *
+     * @param $object
+     * @param $property
+     * @return mixed
+     * @throws RecursionException
+     */
+    private function exposeValue($object, $property)
+    {
+        $attributes = get_object_vars($object);
+        if (array_key_exists($propertyName = $property->getName(), $attributes)) {
+            $value =  $object->$propertyName;
+        } else {
+            $value = call_user_func(array($object, 'get' . ucfirst($property->getName())));
+        }
+
+        if ($value === $object) {
+            throw new RecursionException(sprintf('Invalid self reference detected. %s::%s', $this->getFullClassName($object), $property->getName()));
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param $object
+     * @param $property
+     * @param $value
+     */
+    private function involveValue($object, $property, $value)
+    {
+        $attributes = get_object_vars($object);
+        if (array_key_exists($propertyName = $property->getName(), $attributes)) {
+            $object->$propertyName = $value;
+        } else {
+            call_user_func_array(array($object, 'set' . ucfirst($property->getName())), array($value));
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A;
  */
 class Recursion
 {
-    private $object;
+    public $object;
 
     public function setObject($object)
     {
