@@ -29,7 +29,6 @@ Strict - serializer extra check incoming parameters completely as expected if th
 Some Restrictions:
 
 - object must have configuration for serialize/unserialize
-- object must have set/get methods for serialize/unserialize attributes
 
 Possible TODO list:
 
