@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Simple Serializer",
     "keywords": ["json","serializer", "php"],
-    "homepage": "http://github.com/opensoft/php-fedex",
+    "homepage": "http://github.com/opensoft/simple-serializer",
     "license": "MIT",
     "authors": [
         {
