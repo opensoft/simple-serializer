@@ -234,7 +234,7 @@ class ArrayAdapter implements BaseArrayAdapter
                     $tmpType->setType($matches['type']);
                 }
                 if ($direct == self::DIRECTION_UNSERIALIZE) {
-                    $existsData = call_user_func(array($object, 'get' . ucfirst($property->getName())));
+                    $existsData = $this->exposeValue($object, $property);
                 }
                 foreach ($value as $k => $v) {
                     $tmpObject = $object;
@@ -254,7 +254,7 @@ class ArrayAdapter implements BaseArrayAdapter
                 if ($inner) {
                     $innerObject = $object;
                 } else {
-                    $innerObject = call_user_func(array($object, 'get' . ucfirst($property->getName())));
+                    $innerObject = $this->exposeValue($object, $property);
                 }
                 if (!is_object($innerObject) || !$innerObject instanceof $type) {
                     $innerObject = unserialize(sprintf('O:%d:"%s":0:{}', strlen($type), $type));
