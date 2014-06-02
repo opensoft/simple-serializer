@@ -257,7 +257,12 @@ class ArrayAdapter implements BaseArrayAdapter
                     $innerObject = $this->exposeValue($object, $property);
                 }
                 if (!is_object($innerObject) || !$innerObject instanceof $type) {
-                    $innerObject = unserialize(sprintf('O:%d:"%s":0:{}', strlen($type), $type));
+                    if (PHP_VERSION_ID >= 50400) {
+                        $rc = new \ReflectionClass($type);
+                        $innerObject = $rc->newInstanceWithoutConstructor();
+                    } else {
+                        $innerObject = unserialize(sprintf('O:%d:"%s":0:{}', strlen($type), $type));
+                    }
                 }
                 $value = $this->toObject($value, $innerObject);
             } elseif ($type !== null) {
