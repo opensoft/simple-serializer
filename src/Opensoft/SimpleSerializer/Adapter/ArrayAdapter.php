@@ -274,8 +274,6 @@ class ArrayAdapter implements BaseArrayAdapter
     }
 
     /**
-     * @todo should be refactor
-     *
      * @param $object
      * @param $property
      * @return mixed
