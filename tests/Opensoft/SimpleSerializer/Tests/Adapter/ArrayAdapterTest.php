@@ -406,6 +406,15 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($result->getHiddenStatus());
     }
 
+    /**
+     * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
+     */
+    public function testToObjectDateTimeInvalidArgument()
+    {
+        $object = new TestDateTime();
+        $this->unitUnderTest->toObject(array('emptyDateTimeFormat' => ""), $object);
+    }
+
     public function testNonStrictUnserializeHasExtraFields()
     {
         $this->unitUnderTest->setUnserializeMode(0);
