@@ -264,7 +264,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(34, $arrayAssoc['str']);
         $this->assertInstanceOf('\DateTime', $result->getObject()->getDateTime());
         $this->assertEquals('2005-08-15T15:52:01+0000', $result->getObject()->getDateTime()->format(DateTime::ISO8601));
-        
+
         $this->assertEquals(3, $objects[0]->getRid());
         $this->assertEquals('test', $objects[0]->getName());
         $this->assertTrue($objects[0]->getStatus());
@@ -326,6 +326,43 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(23, $objects[0]->getName());
         $this->assertNull($objects[0]->getFloat());
         $this->assertTrue($objects[0]->getHiddenStatus());
+    }
+
+    /**
+     * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
+     * @dataProvider toObjectDateTimeRejectDataProvider
+     *
+     * @param string $dateTimeString
+     */
+    public function testToObjectDateTimeReject($dateTimeString)
+    {
+        $object = new TestDateTime();
+        $array = array(
+            'emptyDateTimeFormat' => null,
+            'dateTimeConstant' => null,
+            'dateTimeString' => $dateTimeString, //Y-m-d\TH:i:sP,
+            'dateTimeStringWithSpace' => null
+        );
+
+        $this->unitUnderTest->toObject($array, $object);
+    }
+
+    public function toObjectDateTimeRejectDataProvider()
+    {
+        return array(
+            'timezone is lost' => array('2014-01-25T20:00:58'),
+            'seconds is lost' => array('2014-01-25T20:00+02:00'),
+            'minutes is outbound' => array('2014-01-25T20:88:58+02:00'),
+            'month is zero' => array('2014-00-25T20:00:58+02:00'),
+            'day is outbound' => array('2014-02-95T20:00:58+02:00'),
+            'year is outbound' => array('99999-12-25T20:00:58+02:00'),
+            'year is invalid' => array('qwer-00-25T20:00:58+02:00'),
+            'month is outbound' => array('2014-18-25T20:00:58+02:00'),
+            'date is empty string' => array(''),
+            'date is empty string with spaces' => array('     '),
+            'date is malformed' => array('12345'),
+            'date is zero' => array('0'),
+        );
     }
 
     public function testToObjectGroup()

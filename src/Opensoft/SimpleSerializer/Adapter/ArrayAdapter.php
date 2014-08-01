@@ -211,22 +211,29 @@ class ArrayAdapter implements BaseArrayAdapter
                 $value = (double)$value;
             } elseif ($type === 'DateTime' || ($type[0] === 'D' && strpos($type, 'DateTime<') === 0)) {
                 if ($direct == self::DIRECTION_SERIALIZE) {
-                    $dateTimeFormat = DateTime::ISO8601;
-                    if (preg_match('/DateTime<(?<type>[a-zA-Z0-9\,\.\s\-\:\/\\\]+)>/', $type, $matches)) {
-                        $dateTimeFormat = $matches['type'];
-                        if (defined('\DateTime::' . $dateTimeFormat)) {
-                            $dateTimeFormat = constant('\DateTime::' . $dateTimeFormat);
-                        }
-                    }
+                    $dateTimeFormat = $this->extractDateTimeFormat($type, DateTime::ISO8601);
+
                     $value = $value->format($dateTimeFormat);
                 } elseif ($direct == self::DIRECTION_UNSERIALIZE) {
-                    if (trim($value) === "") {
-                        throw new InvalidArgumentException(sprintf('Invalid DateTime argument "%s"', $value));
+                    $originalValue = trim($value);
+
+                    $dateTimeFormat = $this->extractDateTimeFormat($type);
+
+                    // we should not allow empty string as date time argument.
+                    //It can lead us to unexpected results
+                    //Only 'null' is possible empty value
+                    if (!$originalValue) {
+                        throw new InvalidArgumentException('DateTime argument should be well formed string');
                     }
+
                     try {
                         $value = new DateTime($value);
                     } catch (\Exception $e) {
                         throw new InvalidArgumentException(sprintf('Invalid DateTime argument "%s"', $value), $e->getCode(), $e);
+                    }
+                    // if format was specified in metadata - format and compare parsed DateTime object with original string
+                    if (isset($dateTimeFormat) && $value->format($dateTimeFormat) !== $originalValue) {
+                        throw new InvalidArgumentException(sprintf('Invalid DateTime argument "%s"', $originalValue));
                     }
                 }
             } elseif ($type === 'array' || ($type[0] === 'a' && strpos($type, 'array<') === 0)) {
@@ -311,5 +318,27 @@ class ArrayAdapter implements BaseArrayAdapter
         } else {
             call_user_func_array(array($object, 'set' . ucfirst($property->getName())), array($value));
         }
+    }
+
+    /**
+     * Extracts specified date time format from given source
+     * If source does not contain any format - returns default value
+     *
+     * @param string $source
+     * @param string|null $defaultValue
+     * @return string|null
+     */
+    private function extractDateTimeFormat($source, $defaultValue = null)
+    {
+        $dateTimeFormat = $defaultValue;
+
+        if (preg_match('/DateTime<(?<type>[a-zA-Z0-9\,\.\s\-\:\/\\\]+)>/', $source, $matches)) {
+            $dateTimeFormat = $matches['type'];
+            if (defined('\DateTime::' . $dateTimeFormat)) {
+                $dateTimeFormat = constant('\DateTime::' . $dateTimeFormat);
+            }
+        }
+
+        return $dateTimeFormat;
     }
 }
