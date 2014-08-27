@@ -108,6 +108,7 @@ class Serializer
     }
 
     /**
+     * @deprecated
      * @param string $version
      * @return bool
      */
@@ -123,6 +124,7 @@ class Serializer
     }
 
     /**
+     * @deprecated
      * @param array $groups
      * @return bool
      */

@@ -17,6 +17,7 @@ use Opensoft\SimpleSerializer\Exception\RecursionException;
 use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 use Opensoft\SimpleSerializer\Exclusion\ExclusionStrategyInterface;
+use Opensoft\SimpleSerializer\Exclusion\Checker;
 use DateTime;
 
 /**
@@ -36,9 +37,9 @@ class ArrayAdapter implements BaseArrayAdapter
     private $metadataFactory;
 
     /**
-     * @var ExclusionStrategyInterface|null
+     * @var Checker
      */
-    private $exclusionStrategy;
+    private $exclusionChecker;
 
     /**
      * @var integer
@@ -52,6 +53,7 @@ class ArrayAdapter implements BaseArrayAdapter
     public function __construct(MetadataFactory $metadataFactory, $unserializeMode = self::NON_STRICT_MODE)
     {
         $this->metadataFactory = $metadataFactory;
+        $this->exclusionChecker = new Checker();
         $this->setUnserializeMode($unserializeMode);
     }
 
@@ -67,7 +69,7 @@ class ArrayAdapter implements BaseArrayAdapter
         $className = $this->getFullClassName($object);
         $metadata = $this->metadataFactory->getMetadataForClass($className);
         foreach ($metadata->getProperties() as $property) {
-            if (!$property->isExpose() || ($this->exclusionStrategy !== null && $this->exclusionStrategy->shouldSkipProperty($property))) {
+            if (!$property->isExpose() || $this->exclusionChecker->shouldSkipProperty($property)) {
                 continue;
             }
 
@@ -93,7 +95,7 @@ class ArrayAdapter implements BaseArrayAdapter
         $metadata = $this->metadataFactory->getMetadataForClass($className);
         $unserializedProperties = 0;
         foreach ($metadata->getProperties() as $property) {
-            if (!$property->isExpose() || ($this->exclusionStrategy !== null && $this->exclusionStrategy->shouldSkipProperty($property))) {
+            if (!$property->isExpose() || $this->exclusionChecker->shouldSkipProperty($property)) {
                 if ($this->isMediumStrictUnserializeMode() && array_key_exists($property->getSerializedName(), $data)) {
                     throw new InvalidArgumentException(sprintf('%s extra field', $property->getSerializedName()));
                 }
@@ -131,7 +133,12 @@ class ArrayAdapter implements BaseArrayAdapter
      */
     public function setExclusionStrategy(ExclusionStrategyInterface $exclusionStrategy = null)
     {
-        $this->exclusionStrategy = $exclusionStrategy;
+        if ($exclusionStrategy) {
+            $this->exclusionChecker->add($exclusionStrategy);
+        }
+        else {
+            $this->exclusionChecker->reset();
+        }
 
         return $this;
     }
