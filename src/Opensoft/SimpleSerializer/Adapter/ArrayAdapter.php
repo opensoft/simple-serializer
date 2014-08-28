@@ -133,7 +133,7 @@ class ArrayAdapter implements BaseArrayAdapter
      */
     public function setExclusionStrategy(ExclusionStrategyInterface $exclusionStrategy = null)
     {
-        $this->propertySkipper->cleanUpStrategies();
+        $this->cleanUpExclusionStrategies();
         if ($exclusionStrategy) {
             $this->addExclusionStrategy($exclusionStrategy);
         }
@@ -150,6 +150,11 @@ class ArrayAdapter implements BaseArrayAdapter
     public function addExclusionStrategy(ExclusionStrategyInterface $exclusionStrategy)
     {
         $this->propertySkipper->registerStrategy($exclusionStrategy);
+    }
+
+    public function cleanUpExclusionStrategies()
+    {
+        $this->propertySkipper->cleanUpStrategies();
     }
 
     /**

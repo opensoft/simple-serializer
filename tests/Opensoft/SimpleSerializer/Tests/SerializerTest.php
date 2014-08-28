@@ -135,7 +135,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $expectedString = '[]';
         $this->assertEquals($expectedString, $result);
 
-        $this->unitUnderTest->resetExclusionStrategies();
+        $this->unitUnderTest->cleanUpExclusionStrategies();
         $result = $this->unitUnderTest->serialize($a);
         $expectedString = '{"id":1,"name":"name","status":true}';
         $this->assertEquals($expectedString, $result);

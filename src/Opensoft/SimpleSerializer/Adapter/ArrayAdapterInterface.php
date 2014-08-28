@@ -38,6 +38,7 @@ interface ArrayAdapterInterface
 
     /**
      * Sets ExclusionStrategy
+     * @deprecated Deprecated since version 1.1 to be removed in 2
      *
      * @param ExclusionStrategyInterface|null $exclusionStrategy
      * @return ArrayAdapterInterface
@@ -49,6 +50,8 @@ interface ArrayAdapterInterface
      * @return ArrayAdapterInterface
      */
     public function addExclusionStrategy(ExclusionStrategyInterface $exclusionStrategy);
+
+    public function cleanUpExclusionStrategies();
 
     /**
      * Sets Unserialized mode

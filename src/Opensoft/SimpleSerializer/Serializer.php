@@ -148,9 +148,9 @@ class Serializer
         $this->arrayAdapter->addExclusionStrategy($exclusionStrategy);
     }
 
-    public function resetExclusionStrategies()
+    public function cleanUpExclusionStrategies()
     {
-       $this->arrayAdapter->setExclusionStrategy();
+       $this->arrayAdapter->cleanUpExclusionStrategies();
     }
 
     /**
