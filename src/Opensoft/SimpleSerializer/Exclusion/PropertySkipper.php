@@ -22,14 +22,13 @@ final class PropertySkipper
     /**
      * @var ExclusionStrategyInterface[]
      */
-    private $strategies;
+    private $strategies = array();
 
     /**
      * @param ExclusionStrategyInterface[] $strategies
      */
     public function __construct($strategies = array())
     {
-        $this->reset();
         foreach ($strategies as $strategy) {
             $this->registerStrategy($strategy);
         }
@@ -43,10 +42,7 @@ final class PropertySkipper
         $this->strategies[] = $strategy;
     }
 
-    /**
-     *
-     */
-    public function reset()
+    public function cleanUpStrategies()
     {
         $this->strategies = array();
     }

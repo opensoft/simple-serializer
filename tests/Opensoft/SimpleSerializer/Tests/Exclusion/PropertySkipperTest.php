@@ -51,7 +51,7 @@ class PropertySkipperTest extends \PHPUnit_Framework_TestCase
         $this->propertySkipper->registerStrategy($nonSkipExclusionGroupStrategy);
         $this->assertTrue($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
-        $this->propertySkipper->reset();
+        $this->propertySkipper->cleanUpStrategies();
 
         $this->propertySkipper->registerStrategy($nonSkipExclusionGroupStrategy);
         $this->assertFalse($this->propertySkipper->shouldSkip($this->propertyMetadata));
@@ -64,7 +64,7 @@ class PropertySkipperTest extends \PHPUnit_Framework_TestCase
         $this->propertySkipper->registerStrategy($nonSkipExclusionVersionStrategy);
         $this->assertTrue($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
-        $this->propertySkipper->reset();
+        $this->propertySkipper->cleanUpStrategies();
 
         $this->propertySkipper->registerStrategy($nonSkipExclusionGroupStrategy);
         $this->assertFalse($this->propertySkipper->shouldSkip($this->propertyMetadata));
@@ -72,7 +72,7 @@ class PropertySkipperTest extends \PHPUnit_Framework_TestCase
         $this->propertySkipper->registerStrategy($skipExclusionGroupStrategy);
         $this->assertTrue($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
-        $this->propertySkipper->reset();
+        $this->propertySkipper->cleanUpStrategies();
         $this->assertFalse($this->propertySkipper->shouldSkip($this->propertyMetadata));
     }
 
