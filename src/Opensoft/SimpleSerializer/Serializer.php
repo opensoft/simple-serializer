@@ -109,7 +109,7 @@ class Serializer
     }
 
     /**
-     * @deprecated
+     * @deprecated Deprecated since version 1.1 to be removed in 2
      * @param string $version
      * @return bool
      */
@@ -125,7 +125,7 @@ class Serializer
     }
 
     /**
-     * @deprecated
+     * @deprecated Deprecated since version 1.1 to be removed in 2
      * @param array $groups
      * @return bool
      */
@@ -148,9 +148,6 @@ class Serializer
         $this->arrayAdapter->addExclusionStrategy($exclusionStrategy);
     }
 
-    /**
-     *
-     */
     public function resetExclusionStrategies()
     {
        $this->arrayAdapter->setExclusionStrategy();
