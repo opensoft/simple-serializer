@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of the Simple Serializer.
+ *
+ * Copyright (c) 2012 Farheap Solutions (http://www.farheap.com)
+ *
+ * For the full copyright and license information, please view the
+ * LICENSE file that was distributed with this source code.
+ */
+
 namespace Opensoft\SimpleSerializer\Exclusion;
 
 use Opensoft\SimpleSerializer\Exclusion\ExclusionStrategyInterface;
@@ -8,7 +17,7 @@ use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 /**
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-final class Checker
+final class PropertySkipper
 {
     /**
      * @var ExclusionStrategyInterface[]
@@ -18,11 +27,11 @@ final class Checker
     /**
      * @param ExclusionStrategyInterface[] $strategies
      */
-    public function __constructor($strategies = array())
+    public function __construct($strategies = array())
     {
         $this->reset();
         foreach ($strategies as $strategy) {
-            $this->add($strategy);
+            $this->registerStrategy($strategy);
         }
     }
 
@@ -46,7 +55,7 @@ final class Checker
      * @param PropertyMetadata $property
      * @return bool
      */
-    public function shouldSkipProperty(PropertyMetadata $property)
+    public function shouldSkip(PropertyMetadata $property)
     {
         foreach ($this->strategies as $strategy) {
             if ($strategy->shouldSkipProperty($property)) {
@@ -56,4 +65,4 @@ final class Checker
 
         return false;
     }
-} 
+}

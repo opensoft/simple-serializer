@@ -14,6 +14,7 @@ namespace Opensoft\SimpleSerializer;
 use Opensoft\SimpleSerializer\Adapter\ArrayAdapterInterface;
 use Opensoft\SimpleSerializer\Adapter\SerializerAdapterInterface;
 use Opensoft\SimpleSerializer\Exception\InvalidArgumentException;
+use Opensoft\SimpleSerializer\Exclusion\ExclusionStrategyInterface;
 use Opensoft\SimpleSerializer\Exclusion\VersionExclusionStrategy;
 use Opensoft\SimpleSerializer\Exclusion\GroupsExclusionStrategy;
 
@@ -137,6 +138,22 @@ class Serializer
         }
 
         $this->arrayAdapter->setExclusionStrategy(new GroupsExclusionStrategy($groups));
+    }
+
+    /**
+     * @param ExclusionStrategyInterface $exclusionStrategy
+     */
+    public function addExclusionStrategy(ExclusionStrategyInterface $exclusionStrategy)
+    {
+        $this->arrayAdapter->addExclusionStrategy($exclusionStrategy);
+    }
+
+    /**
+     *
+     */
+    public function resetExclusionStrategies()
+    {
+       $this->arrayAdapter->setExclusionStrategy();
     }
 
     /**

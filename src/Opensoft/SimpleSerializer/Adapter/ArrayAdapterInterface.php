@@ -45,6 +45,12 @@ interface ArrayAdapterInterface
     public function setExclusionStrategy(ExclusionStrategyInterface $exclusionStrategy = null);
 
     /**
+     * @param ExclusionStrategyInterface $exclusionStrategy
+     * @return ArrayAdapterInterface
+     */
+    public function addExclusionStrategy(ExclusionStrategyInterface $exclusionStrategy);
+
+    /**
      * Sets Unserialized mode
      *
      * @param boolean $unserializeMode
