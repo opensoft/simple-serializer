@@ -16,6 +16,8 @@ use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A;
+use Opensoft\SimpleSerializer\Exclusion\VersionExclusionStrategy;
+use Opensoft\SimpleSerializer\Exclusion\GroupsExclusionStrategy;
 use DateTime;
 
 /**
@@ -105,6 +107,35 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedString, $result);
 
         $this->unitUnderTest->setVersion(null);
+        $result = $this->unitUnderTest->serialize($a);
+        $expectedString = '{"id":1,"name":"name","status":true}';
+        $this->assertEquals($expectedString, $result);
+    }
+
+    public function testSerializeWithExclusions()
+    {
+        $a = new A();
+        $a->setRid(1);
+        $a->setName('name');
+        $a->setStatus(true);
+        $a->setHiddenStatus(true);
+
+        $this->unitUnderTest->addExclusionStrategy(new GroupsExclusionStrategy(array('get')));
+        $result = $this->unitUnderTest->serialize($a);
+        $expectedString = '{"status":true}';
+        $this->assertEquals($expectedString, $result);
+
+        $this->unitUnderTest->addExclusionStrategy(new VersionExclusionStrategy('1.5'));
+        $result = $this->unitUnderTest->serialize($a);
+        $expectedString = '{"status":true}';
+        $this->assertEquals($expectedString, $result);
+
+        $this->unitUnderTest->addExclusionStrategy(new VersionExclusionStrategy('2.5'));
+        $result = $this->unitUnderTest->serialize($a);
+        $expectedString = '[]';
+        $this->assertEquals($expectedString, $result);
+
+        $this->unitUnderTest->resetExclusionStrategies();
         $result = $this->unitUnderTest->serialize($a);
         $expectedString = '{"id":1,"name":"name","status":true}';
         $this->assertEquals($expectedString, $result);

@@ -31,6 +31,14 @@ class PropertySkipperTest extends \PHPUnit_Framework_TestCase
      */
     private $propertySkipper;
 
+    public function testConstructor()
+    {
+        $newSkipper = new PropertySkipper(array(
+            new GroupsExclusionStrategy(array('test1'))
+        ));
+        $this->assertTrue($newSkipper->shouldSkip($this->propertyMetadata));
+    }
+
     public function testShouldSkip()
     {
         $this->assertFalse($this->propertySkipper->shouldSkip($this->propertyMetadata));
