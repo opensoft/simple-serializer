@@ -31,7 +31,6 @@
 
 namespace Opensoft\SimpleSerializer\Exclusion;
 
-use Opensoft\SimpleSerializer\Metadata\ClassMetadata;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 use Opensoft\SimpleSerializer\Exception\RuntimeException;
 
@@ -39,7 +38,7 @@ use Opensoft\SimpleSerializer\Exception\RuntimeException;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  */
-class GroupsExclusionStrategy implements ExclusionStrategyInterface
+class GroupsSpecification implements Specification
 {
     /**
      * @var array
@@ -53,7 +52,7 @@ class GroupsExclusionStrategy implements ExclusionStrategyInterface
     public function __construct(array $groups)
     {
         if (empty($groups)) {
-            throw new RuntimeException('Empty group array may not be configured for GroupsExclusionStrategy');
+            throw new RuntimeException('Empty group array may not be configured for Groups');
         }
 
         foreach ($groups as $group) {
@@ -62,23 +61,12 @@ class GroupsExclusionStrategy implements ExclusionStrategyInterface
     }
 
     /**
-     * {@inheritDOc}
-     *
-     * @param ClassMetadata $metadata
-     * @return bool
-     */
-    public function shouldSkipClass(ClassMetadata $metadata)
-    {
-        return false;
-    }
-
-    /**
      * {@inheritDoc}
      *
      * @param PropertyMetadata $property
      * @return bool
      */
-    public function shouldSkipProperty(PropertyMetadata $property)
+    public function isSatisfiedBy(PropertyMetadata $property)
     {
         if (!$property->getGroups()) {
             return true;

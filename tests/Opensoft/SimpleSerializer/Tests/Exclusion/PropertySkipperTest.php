@@ -11,10 +11,10 @@
 
 namespace Opensoft\SimpleSerializer\Tests\Exclusion;
 
-use Opensoft\SimpleSerializer\Exclusion\PropertySkipper;
+use Opensoft\SimpleSerializer\Normalization\PropertySkipper;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
-use Opensoft\SimpleSerializer\Exclusion\GroupsExclusionStrategy;
-use Opensoft\SimpleSerializer\Exclusion\VersionExclusionStrategy;
+use Opensoft\SimpleSerializer\Exclusion\GroupsSpecification;
+use Opensoft\SimpleSerializer\Exclusion\VersionSpecification;
 
 /**
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
@@ -34,7 +34,7 @@ class PropertySkipperTest extends \PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $newSkipper = new PropertySkipper(array(
-            new GroupsExclusionStrategy(array('test1'))
+            new GroupsSpecification(array('test1'))
         ));
         $this->assertTrue($newSkipper->shouldSkip($this->propertyMetadata));
     }
@@ -43,11 +43,11 @@ class PropertySkipperTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
-        $skipExclusionGroupStrategy = new GroupsExclusionStrategy(array('test1'));
+        $skipExclusionGroupStrategy = new GroupsSpecification(array('test1'));
         $this->propertySkipper->registerStrategy($skipExclusionGroupStrategy);
         $this->assertTrue($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
-        $nonSkipExclusionGroupStrategy = new GroupsExclusionStrategy(array('test'));
+        $nonSkipExclusionGroupStrategy = new GroupsSpecification(array('test'));
         $this->propertySkipper->registerStrategy($nonSkipExclusionGroupStrategy);
         $this->assertTrue($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
@@ -56,11 +56,11 @@ class PropertySkipperTest extends \PHPUnit_Framework_TestCase
         $this->propertySkipper->registerStrategy($nonSkipExclusionGroupStrategy);
         $this->assertFalse($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
-        $skipExclusionVersionStrategy = new VersionExclusionStrategy('5.5');
+        $skipExclusionVersionStrategy = new VersionSpecification('5.5');
         $this->propertySkipper->registerStrategy($skipExclusionVersionStrategy);
         $this->assertTrue($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
-        $nonSkipExclusionVersionStrategy = new VersionExclusionStrategy('5.1');
+        $nonSkipExclusionVersionStrategy = new VersionSpecification('5.1');
         $this->propertySkipper->registerStrategy($nonSkipExclusionVersionStrategy);
         $this->assertTrue($this->propertySkipper->shouldSkip($this->propertyMetadata));
 

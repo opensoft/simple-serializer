@@ -9,7 +9,7 @@
  * LICENSE file that was distributed with this source code.
  */
 
-namespace Opensoft\SimpleSerializer\Tests\Adapter;
+namespace Opensoft\SimpleSerializer\Tests\Normalization;
 
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
@@ -17,32 +17,33 @@ use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\D;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\Recursion;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\DateTime as TestDateTime;
-use Opensoft\SimpleSerializer\Adapter\ArrayAdapterInterface;
+use Opensoft\SimpleSerializer\Normalization\Normalizer;
+use Opensoft\SimpleSerializer\Normalization\PropertySkipper;
 use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
-use Opensoft\SimpleSerializer\Exclusion\GroupsExclusionStrategy;
-use Opensoft\SimpleSerializer\Exclusion\VersionExclusionStrategy;
+use Opensoft\SimpleSerializer\Exclusion\GroupsSpecification;
+use Opensoft\SimpleSerializer\Exclusion\VersionSpecification;
 use DateTime;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  */
-class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
+class ArrayNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ArrayAdapterInterface;
+     * @var Normalizer;
      */
     private $unitUnderTest;
 
     private $metadataFactory;
 
-    public function testToArray()
+    public function testNormalization()
     {
         $object = new A();
         $object->setRid(2)
             ->setName('testName')
             ->setStatus(true)
             ->setHiddenStatus(false);
-        $result = $this->unitUnderTest->toArray($object);
+        $result = $this->unitUnderTest->normalize($object);
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('id', $result);
         $this->assertArrayHasKey('name', $result);
@@ -62,7 +63,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $time = time();
         $object->setDateTime(new DateTime(date('Y-m-d H:i:s', $time)));
         $object->setNull(null);
-        $result = $this->unitUnderTest->toArray($object);
+        $result = $this->unitUnderTest->normalize($object);
         $this->assertCount(8, $result);
         $this->assertArrayHasKey('id', $result);
         $this->assertArrayHasKey('name', $result);
@@ -86,7 +87,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $objectComplex->setRid(434);
         $objectComplex->setObject($object);
         $objectComplex->setArrayOfObjects(array($object, $object));
-        $resultComplex = $this->unitUnderTest->toArray($objectComplex);
+        $resultComplex = $this->unitUnderTest->normalize($objectComplex);
         $this->assertCount(3, $resultComplex);
         $this->assertArrayHasKey('object', $resultComplex);
         $this->assertEquals($result, $resultComplex['object']);
@@ -94,7 +95,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($result, $result), $resultComplex['arrayOfObjects']);
     }
 
-    public function testToArrayDateTime()
+    public function testDateTimeNormalization()
     {
         $object = new TestDateTime();
         $time = new DateTime();
@@ -103,7 +104,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             ->setDateTimeStringWithSpace($time)
             ->setEmptyDateTimeFormat($time);
 
-        $result = $this->unitUnderTest->toArray($object);
+        $result = $this->unitUnderTest->normalize($object);
         $this->assertCount(4, $result);
         $this->assertArrayHasKey('dateTimeConstant', $result);
         $this->assertArrayHasKey('dateTimeString', $result);
@@ -118,14 +119,14 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Opensoft\SimpleSerializer\Exception\RecursionException
      */
-    public function testToArrayRecursionException()
+    public function testNormalizationRecursionException()
     {
         $objectComplex = new Recursion();
         $objectComplex->setObject($objectComplex);
-        $this->unitUnderTest->toArray($objectComplex);
+        $this->unitUnderTest->normalize($objectComplex);
     }
 
-    public function testToArrayGroup()
+    public function testNormalizationWithGroupExclusion()
     {
         $object = new A();
         $object->setRid(2)
@@ -133,19 +134,21 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             ->setStatus(true)
             ->setHiddenStatus(false);
 
-        $this->unitUnderTest->setExclusionStrategy(new GroupsExclusionStrategy(array('support')));
-        $result = $this->unitUnderTest->toArray($object);
+        $this->unitUnderTest->cleanUpExclusionSpecifications();
+        $this->unitUnderTest->addExclusionSpecification(new GroupsSpecification(array('support')));
+        $result = $this->unitUnderTest->normalize($object);
         $this->assertCount(0, $result);
 
-        $this->unitUnderTest->setExclusionStrategy(new GroupsExclusionStrategy(array('get')));
-        $result = $this->unitUnderTest->toArray($object);
+        $this->unitUnderTest->cleanUpExclusionSpecifications();
+        $this->unitUnderTest->addExclusionSpecification(new GroupsSpecification(array('get')));
+        $result = $this->unitUnderTest->normalize($object);
         $this->assertCount(1, $result);
         $this->assertArrayHasKey('status', $result);
         $this->assertTrue($result['status']);
 
 
-        $this->unitUnderTest->setExclusionStrategy(null);
-        $result = $this->unitUnderTest->toArray($object);
+        $this->unitUnderTest->cleanUpExclusionSpecifications();
+        $result = $this->unitUnderTest->normalize($object);
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('id', $result);
         $this->assertArrayHasKey('name', $result);
@@ -155,7 +158,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($result['status']);
     }
 
-    public function testToArrayVersion()
+    public function testNormalizationWithVersionExclusion()
     {
         $object = new A();
         $object->setRid(2)
@@ -163,24 +166,27 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             ->setStatus(true)
             ->setHiddenStatus(false);
 
-        $this->unitUnderTest->setExclusionStrategy(new VersionExclusionStrategy('0.5'));
-        $result = $this->unitUnderTest->toArray($object);
+        $this->unitUnderTest->cleanUpExclusionSpecifications();
+        $this->unitUnderTest->addExclusionSpecification(new VersionSpecification('0.5'));
+        $result = $this->unitUnderTest->normalize($object);
         $this->assertCount(2, $result);
         $this->assertArrayHasKey('id', $result);
         $this->assertArrayHasKey('name', $result);
         $this->assertEquals(2, $result['id']);
         $this->assertEquals('testName', $result['name']);
 
-        $this->unitUnderTest->setExclusionStrategy(new VersionExclusionStrategy('2.5'));
-        $result = $this->unitUnderTest->toArray($object);
+        $this->unitUnderTest->cleanUpExclusionSpecifications();
+        $this->unitUnderTest->addExclusionSpecification(new VersionSpecification('2.5'));
+        $result = $this->unitUnderTest->normalize($object);
         $this->assertCount(2, $result);
         $this->assertArrayHasKey('id', $result);
         $this->assertArrayHasKey('name', $result);
         $this->assertEquals(2, $result['id']);
         $this->assertEquals('testName', $result['name']);
 
-        $this->unitUnderTest->setExclusionStrategy(new VersionExclusionStrategy('1.5'));
-        $result = $this->unitUnderTest->toArray($object);
+        $this->unitUnderTest->cleanUpExclusionSpecifications();
+        $this->unitUnderTest->addExclusionSpecification(new VersionSpecification('1.5'));
+        $result = $this->unitUnderTest->normalize($object);
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('id', $result);
         $this->assertArrayHasKey('name', $result);
@@ -188,8 +194,8 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('testName', $result['name']);
 
 
-        $this->unitUnderTest->setExclusionStrategy(null);
-        $result = $this->unitUnderTest->toArray($object);
+        $this->unitUnderTest->cleanUpExclusionSpecifications();
+        $result = $this->unitUnderTest->normalize($object);
         $this->assertCount(3, $result);
         $this->assertArrayHasKey('id', $result);
         $this->assertArrayHasKey('name', $result);
@@ -207,10 +213,10 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $object = new D();
         $object->setRid(4);
         $object->setName('test');
-        $this->unitUnderTest->toArray($object);
+        $this->unitUnderTest->normalize($object);
     }
 
-    public function testToObject()
+    public function testDenormalization()
     {
         $object = new E();
         $array = array(
@@ -240,7 +246,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
                 )
             )
         );
-        $result = $this->unitUnderTest->toObject($array, $object);
+        $result = $this->unitUnderTest->denormalize($array, $object);
 
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E', $result);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren', $result->getObject());
@@ -286,7 +292,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
     /**
      * @group Test
      */
-    public function testToObjectWithData()
+    public function testDenormalizationWithData()
     {
         $object = new E();
         $objectA = new AChildren();
@@ -310,7 +316,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
                 )
             )
         );
-        $result = $this->unitUnderTest->toObject($array, $object);
+        $result = $this->unitUnderTest->denormalize($array, $object);
 
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E', $result);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren', $result->getObject());
@@ -330,11 +336,11 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
-     * @dataProvider toObjectDateTimeRejectDataProvider
+     * @dataProvider denormalizeDateTimeRejectDataProvider
      *
      * @param string $dateTimeString
      */
-    public function testToObjectDateTimeReject($dateTimeString)
+    public function testDenormalizationDateTimeReject($dateTimeString)
     {
         $object = new TestDateTime();
         $array = array(
@@ -344,10 +350,10 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             'dateTimeStringWithSpace' => null
         );
 
-        $this->unitUnderTest->toObject($array, $object);
+        $this->unitUnderTest->denormalize($array, $object);
     }
 
-    public function toObjectDateTimeRejectDataProvider()
+    public function denormalizeDateTimeRejectDataProvider()
     {
         return array(
             'timezone is lost' => array('2014-01-25T20:00:58'),
@@ -365,7 +371,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testToObjectGroup()
+    public function testDenormalisationWithGroupExclusion()
     {
         $object = new A();
         $array = array(
@@ -375,24 +381,26 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             'hiddenStatus' => false
         );
 
-        $this->unitUnderTest->setExclusionStrategy(new GroupsExclusionStrategy(array('support')));
-        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->unitUnderTest->cleanUpExclusionSpecifications();
+        $this->unitUnderTest->addExclusionSpecification(new GroupsSpecification(array('support')));
+        $result = $this->unitUnderTest->denormalize($array, $object);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
         $this->assertNull($result->getRid());
         $this->assertNull($result->getName());
         $this->assertNull($result->getStatus());
         $this->assertNull($result->getHiddenStatus());
 
-        $this->unitUnderTest->setExclusionStrategy(new GroupsExclusionStrategy(array('get')));
-        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->unitUnderTest->cleanUpExclusionSpecifications();
+        $this->unitUnderTest->addExclusionSpecification(new GroupsSpecification(array('get')));
+        $result = $this->unitUnderTest->denormalize($array, $object);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
         $this->assertNull($result->getRid());
         $this->assertNull($result->getName());
         $this->assertTrue($result->getStatus());
         $this->assertNull($result->getHiddenStatus());
 
-        $this->unitUnderTest->setExclusionStrategy(null);
-        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->unitUnderTest->cleanUpExclusionSpecifications();
+        $result = $this->unitUnderTest->denormalize($array, $object);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
         $this->assertEquals(3, $result->getRid());
         $this->assertEquals('test', $result->getName());
@@ -400,7 +408,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($result->getHiddenStatus());
     }
 
-    public function testToObjectVersion()
+    public function testDenormalizationWithVersionExclusion()
     {
         $object = new A();
         $array = array(
@@ -410,32 +418,35 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             'hiddenStatus' => false
         );
 
-        $this->unitUnderTest->setExclusionStrategy(new VersionExclusionStrategy('0.5'));
-        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->unitUnderTest->cleanUpExclusionSpecifications();
+        $this->unitUnderTest->addExclusionSpecification(new VersionSpecification('0.5'));
+        $result = $this->unitUnderTest->denormalize($array, $object);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
         $this->assertEquals(3, $result->getRid());
         $this->assertEquals('test', $result->getName());
         $this->assertNull($result->getStatus());
         $this->assertNull($result->getHiddenStatus());
 
-        $this->unitUnderTest->setExclusionStrategy(new VersionExclusionStrategy('2.5'));
-        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->unitUnderTest->cleanUpExclusionSpecifications();
+        $this->unitUnderTest->addExclusionSpecification(new VersionSpecification('2.5'));
+        $result = $this->unitUnderTest->denormalize($array, $object);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
         $this->assertEquals(3, $result->getRid());
         $this->assertEquals('test', $result->getName());
         $this->assertNull($result->getStatus());
         $this->assertNull($result->getHiddenStatus());
 
-        $this->unitUnderTest->setExclusionStrategy(new VersionExclusionStrategy('1.5'));
-        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->unitUnderTest->cleanUpExclusionSpecifications();
+        $this->unitUnderTest->addExclusionSpecification(new VersionSpecification('1.5'));
+        $result = $this->unitUnderTest->denormalize($array, $object);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
         $this->assertEquals(3, $result->getRid());
         $this->assertEquals('test', $result->getName());
         $this->assertTrue($result->getStatus());
         $this->assertNull($result->getHiddenStatus());
 
-        $this->unitUnderTest->setExclusionStrategy(null);
-        $result = $this->unitUnderTest->toObject($array, $object);
+        $this->unitUnderTest->cleanUpExclusionSpecifications();
+        $result = $this->unitUnderTest->denormalize($array, $object);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
         $this->assertEquals(3, $result->getRid());
         $this->assertEquals('test', $result->getName());
@@ -446,10 +457,10 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
      */
-    public function testToObjectDateTimeInvalidArgument()
+    public function testDenormalizationDateTimeInvalidArgument()
     {
         $object = new TestDateTime();
-        $this->unitUnderTest->toObject(array('emptyDateTimeFormat' => ""), $object);
+        $this->unitUnderTest->denormalize(array('emptyDateTimeFormat' => ""), $object);
     }
 
     public function testNonStrictUnserializeHasExtraFields()
@@ -462,7 +473,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             'status' => true,
             'hiddenStatus' => false
         );
-        $result = $this->unitUnderTest->toObject($array, $object);
+        $result = $this->unitUnderTest->denormalize($array, $object);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
         $this->assertEquals(3, $result->getRid());
         $this->assertEquals('test', $result->getName());
@@ -483,7 +494,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             'status' => true,
             'hiddenStatus' => false
         );
-        $this->unitUnderTest->toObject($array, $object);
+        $this->unitUnderTest->denormalize($array, $object);
     }
 
     /**
@@ -498,7 +509,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             'status' => true,
             'dateTime' => 'ssss'
         );
-        $this->unitUnderTest->toObject($array, $object);
+        $this->unitUnderTest->denormalize($array, $object);
     }
 
     /**
@@ -514,7 +525,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             'status' => true,
             'hiddenStatus' => false
         );
-        $this->unitUnderTest->toObject($array, $object);
+        $this->unitUnderTest->denormalize($array, $object);
     }
 
     public function testNonStrictUnserializeLostField()
@@ -525,7 +536,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             'id' => 3,
             'name' => 'test'
         );
-        $result = $this->unitUnderTest->toObject($array, $object);
+        $result = $this->unitUnderTest->denormalize($array, $object);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
         $this->assertEquals(3, $result->getRid());
         $this->assertEquals('test', $result->getName());
@@ -541,7 +552,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             'id' => 3,
             'name' => 'test'
         );
-        $result = $this->unitUnderTest->toObject($array, $object);
+        $result = $this->unitUnderTest->denormalize($array, $object);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
         $this->assertEquals(3, $result->getRid());
         $this->assertEquals('test', $result->getName());
@@ -561,7 +572,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             'name' => 'test',
             'extraField' => 'TEST'
         );
-        $this->unitUnderTest->toObject($array, $object);
+        $this->unitUnderTest->denormalize($array, $object);
     }
 
     public function testNonStrictUnserializeWrongNumberOfFields()
@@ -574,7 +585,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             'status' => true,
             'HAHA' => false
         );
-        $result = $this->unitUnderTest->toObject($array, $object);
+        $result = $this->unitUnderTest->denormalize($array, $object);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A', $result);
         $this->assertEquals(3, $result->getRid());
         $this->assertEquals('test', $result->getName());
@@ -595,7 +606,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             'status' => true,
             'HAHA' => false
         );
-        $this->unitUnderTest->toObject($array, $object);
+        $this->unitUnderTest->denormalize($array, $object);
     }
 
     /**
@@ -611,7 +622,7 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             'status' => true,
             'HAHA' => false
         );
-        $this->unitUnderTest->toObject($array, $object);
+        $this->unitUnderTest->denormalize($array, $object);
     }
 
     /**
@@ -642,6 +653,6 @@ class ArrayAdapterTest extends \PHPUnit_Framework_TestCase
             array($locator)
         );
         $this->metadataFactory = new MetadataFactory($driver);
-        $this->unitUnderTest = $this->getMockForAbstractClass('\Opensoft\SimpleSerializer\Adapter\ArrayAdapter', array($this->metadataFactory));
+        $this->unitUnderTest = $this->getMockForAbstractClass('\Opensoft\SimpleSerializer\Normalization\ArrayNormalizer', array($this->metadataFactory, new PropertySkipper()));
     }
 }
