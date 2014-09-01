@@ -31,30 +31,43 @@
 
 namespace Opensoft\SimpleSerializer\Exclusion;
 
-use Opensoft\SimpleSerializer\Metadata\ClassMetadata;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 
 /**
- * Interface for exclusion strategies.
- *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  */
-interface ExclusionStrategyInterface
+class VersionSpecification implements Specification
 {
     /**
-     * Whether the class should be skipped.
-     *
-     * @param ClassMetadata $metadata
-     * @return boolean
+     * @var string
      */
-    function shouldSkipClass(ClassMetadata $metadata);
+    private $version;
 
     /**
-     * Whether the property should be skipped.
+     * @param string $version
+     */
+    public function __construct($version)
+    {
+        $this->version = $version;
+    }
+
+    /**
+     * {@inheritDoc}
      *
      * @param PropertyMetadata $property
-     * @return boolean
+     * @return bool
      */
-    function shouldSkipProperty(PropertyMetadata $property);
+    public function isSatisfiedBy(PropertyMetadata $property)
+    {
+        if ((null !== $version = $property->getSinceVersion()) && version_compare($this->version, $version, '<')) {
+            return true;
+        }
+
+        if ((null !== $version = $property->getUntilVersion()) && version_compare($this->version, $version, '>')) {
+            return true;
+        }
+
+        return false;
+    }
 }

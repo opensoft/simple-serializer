@@ -9,30 +9,30 @@
  * LICENSE file that was distributed with this source code.
  */
 
-namespace Opensoft\SimpleSerializer\Tests\Adapter;
+namespace Opensoft\SimpleSerializer\Tests\Encoder;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  */
-class JsonAdapterTest extends \PHPUnit_Framework_TestCase
+class JsonEncoderTest extends \PHPUnit_Framework_TestCase
 {
-    private $mockAdapter;
+    private $mockEncoder;
 
     /**
      * @param array $data
      * @param $expectedResult
-     * @dataProvider providerSerialize
+     * @dataProvider providerEncode
      */
-    public function testSerialize(array $data, $expectedResult)
+    public function testEncode(array $data, $expectedResult)
     {
-        $result = $this->mockAdapter->serialize($data);
+        $result = $this->mockEncoder->encode($data);
         $this->assertEquals($expectedResult, $result);
     }
 
     /**
      * @return array
      */
-    public function providerSerialize()
+    public function providerEncode()
     {
         return array(
             array(array(), '[]'),
@@ -49,18 +49,18 @@ class JsonAdapterTest extends \PHPUnit_Framework_TestCase
     /**
      * @param mixed $data
      * @param $expectedResult
-     * @dataProvider providerUnserialize
+     * @dataProvider providerDecode
      */
-    public function testUnserialize($data, $expectedResult)
+    public function testDecode($data, $expectedResult)
     {
-        $result = $this->mockAdapter->unserialize($data);
+        $result = $this->mockEncoder->decode($data);
         $this->assertEquals($expectedResult, $result);
     }
 
     /**
      * @return array
      */
-    public function providerUnserialize()
+    public function providerDecode()
     {
         return array(
             array('[]', array()),
@@ -78,15 +78,15 @@ class JsonAdapterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
-     * @expectedException \Opensoft\SimpleSerializer\Exception\UnserializedException
+     * @expectedException \Opensoft\SimpleSerializer\Exception\DecodedException
      */
-    public function testUnserializedException()
+    public function testDecodedException()
     {
-        $this->mockAdapter->unserialize('{"wrongJson":"}');
+        $this->mockEncoder->decode('{"wrongJson":"}');
     }
 
     protected function setUp()
     {
-        $this->mockAdapter = $this->getMockForAbstractClass('Opensoft\SimpleSerializer\Adapter\JsonAdapter');
+        $this->mockEncoder = $this->getMockForAbstractClass('Opensoft\SimpleSerializer\Encoder\JsonEncoder');
     }
 }

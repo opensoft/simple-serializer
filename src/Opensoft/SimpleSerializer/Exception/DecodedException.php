@@ -14,6 +14,6 @@ namespace Opensoft\SimpleSerializer\Exception;
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  */
-class UnserializedException extends RuntimeException implements Exception
+class DecodedException extends RuntimeException implements Exception
 {
 }

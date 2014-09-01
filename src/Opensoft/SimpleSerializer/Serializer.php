@@ -11,12 +11,12 @@
 
 namespace Opensoft\SimpleSerializer;
 
-use Opensoft\SimpleSerializer\Adapter\ArrayAdapterInterface;
-use Opensoft\SimpleSerializer\Adapter\SerializerAdapterInterface;
+use Opensoft\SimpleSerializer\Normalization\Normalizer;
+use Opensoft\SimpleSerializer\Encoder\SerializerEncoder;
 use Opensoft\SimpleSerializer\Exception\InvalidArgumentException;
-use Opensoft\SimpleSerializer\Exclusion\ExclusionStrategyInterface;
-use Opensoft\SimpleSerializer\Exclusion\VersionExclusionStrategy;
-use Opensoft\SimpleSerializer\Exclusion\GroupsExclusionStrategy;
+use Opensoft\SimpleSerializer\Exclusion\Specification;
+use Opensoft\SimpleSerializer\Exclusion\VersionSpecification;
+use Opensoft\SimpleSerializer\Exclusion\GroupsSpecification;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
@@ -24,14 +24,14 @@ use Opensoft\SimpleSerializer\Exclusion\GroupsExclusionStrategy;
 class Serializer
 {
     /**
-     * @var ArrayAdapterInterface
+     * @var Normalizer
      */
-    private $arrayAdapter;
+    private $normalizer;
 
     /**
-     * @var SerializerAdapterInterface;
+     * @var SerializerEncoder;
      */
-    private $serializerAdapter;
+    private $serializerEncoder;
 
     /**
      * @var boolean
@@ -39,13 +39,13 @@ class Serializer
     private $level = 0;
 
     /**
-     * @param ArrayAdapterInterface $arrayAdapter
-     * @param SerializerAdapterInterface $serializerAdapter
+     * @param Normalizer $normalizer
+     * @param SerializerEncoder $serializerEncoder
      */
-    public function __construct(ArrayAdapterInterface $arrayAdapter, SerializerAdapterInterface $serializerAdapter)
+    public function __construct(Normalizer $normalizer, SerializerEncoder $serializerEncoder)
     {
-        $this->arrayAdapter = $arrayAdapter;
-        $this->serializerAdapter = $serializerAdapter;
+        $this->normalizer = $normalizer;
+        $this->serializerEncoder = $serializerEncoder;
     }
 
     /**
@@ -62,13 +62,13 @@ class Serializer
                 $dataAsArray[$key] = $this->serialize($object);
             }
         } else if (is_object($data)) {
-            $dataAsArray = $this->arrayAdapter->toArray($data);
+            $dataAsArray = $this->normalizer->normalize($data);
         } else {
             $dataAsArray = $data;
         }
         $this->level--;
         if ($this->level === 0) {
-            return $this->serializerAdapter->serialize($dataAsArray);
+            return $this->serializerEncoder->encode($dataAsArray);
         } else {
             return $dataAsArray;
         }
@@ -83,12 +83,12 @@ class Serializer
     public function unserialize($data, $targetData = null)
     {
         if ($this->level === 0) {
-            $unserializedData = $this->serializerAdapter->unserialize($data);
+            $unserializedData = $this->serializerEncoder->decode($data);
         } else {
             $unserializedData = $data;
         }
-        if (is_object($targetData)) {
-            return $this->arrayAdapter->toObject($unserializedData, $targetData);
+        if ($this->normalizer->supportNormalization($targetData)) {
+            return $this->normalizer->denormalize($unserializedData, $targetData);
         } else if (is_array($targetData)) {
             $this->level++;
             $result = array();
@@ -115,13 +115,12 @@ class Serializer
      */
     public function setVersion($version)
     {
+        $this->normalizer->cleanUpExclusionSpecifications();
         if (null === $version) {
-            $this->arrayAdapter->setExclusionStrategy(null);
-
             return false;
         }
 
-        $this->arrayAdapter->setExclusionStrategy(new VersionExclusionStrategy($version));
+        $this->normalizer->addExclusionSpecification(new VersionSpecification($version));
     }
 
     /**
@@ -131,26 +130,25 @@ class Serializer
      */
     public function setGroups(array $groups)
     {
+        $this->cleanUpExclusionSpecifications();
         if (!$groups) {
-            $this->arrayAdapter->setExclusionStrategy(null);
-
             return false;
         }
 
-        $this->arrayAdapter->setExclusionStrategy(new GroupsExclusionStrategy($groups));
+        $this->normalizer->addExclusionSpecification(new GroupsSpecification($groups));
     }
 
     /**
-     * @param ExclusionStrategyInterface $exclusionStrategy
+     * @param Specification $exclusionSpecification
      */
-    public function addExclusionStrategy(ExclusionStrategyInterface $exclusionStrategy)
+    public function addExclusionSpecification(Specification $exclusionSpecification)
     {
-        $this->arrayAdapter->addExclusionStrategy($exclusionStrategy);
+        $this->normalizer->addExclusionSpecification($exclusionSpecification);
     }
 
-    public function cleanUpExclusionStrategies()
+    public function cleanUpExclusionSpecifications()
     {
-       $this->arrayAdapter->cleanUpExclusionStrategies();
+       $this->normalizer->cleanUpExclusionSpecifications();
     }
 
     /**
@@ -158,6 +156,6 @@ class Serializer
      */
     public function setUnserializeMode($unserializeMode)
     {
-        $this->arrayAdapter->setUnserializeMode($unserializeMode);
+        $this->normalizer->setUnserializeMode($unserializeMode);
     }
 }

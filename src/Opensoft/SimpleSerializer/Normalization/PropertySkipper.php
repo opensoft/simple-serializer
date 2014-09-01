@@ -9,9 +9,9 @@
  * LICENSE file that was distributed with this source code.
  */
 
-namespace Opensoft\SimpleSerializer\Exclusion;
+namespace Opensoft\SimpleSerializer\Normalization;
 
-use Opensoft\SimpleSerializer\Exclusion\ExclusionStrategyInterface;
+use Opensoft\SimpleSerializer\Exclusion\Specification;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 
 /**
@@ -20,12 +20,12 @@ use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 final class PropertySkipper
 {
     /**
-     * @var ExclusionStrategyInterface[]
+     * @var Specification[]
      */
     private $strategies = array();
 
     /**
-     * @param ExclusionStrategyInterface[] $strategies
+     * @param Specification[] $strategies
      */
     public function __construct($strategies = array())
     {
@@ -35,9 +35,9 @@ final class PropertySkipper
     }
 
     /**
-     * @param ExclusionStrategyInterface $strategy
+     * @param Specification $strategy
      */
-    public function registerStrategy(ExclusionStrategyInterface $strategy)
+    public function registerStrategy(Specification $strategy)
     {
         $this->strategies[] = $strategy;
     }
@@ -54,7 +54,7 @@ final class PropertySkipper
     public function shouldSkip(PropertyMetadata $property)
     {
         foreach ($this->strategies as $strategy) {
-            if ($strategy->shouldSkipProperty($property)) {
+            if ($strategy->isSatisfiedBy($property)) {
                 return true;
             }
         }

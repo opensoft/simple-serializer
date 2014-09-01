@@ -9,35 +9,34 @@
  * LICENSE file that was distributed with this source code.
  */
 
-namespace Opensoft\SimpleSerializer\Adapter;
+namespace Opensoft\SimpleSerializer\Encoder;
 
-use Opensoft\SimpleSerializer\Adapter\SerializerAdapterInterface;
-use Opensoft\SimpleSerializer\Exception\UnserializedException;
+use Opensoft\SimpleSerializer\Exception\DecodedException;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  */
-class JsonAdapter implements SerializerAdapterInterface
+class JsonEncoder implements SerializerEncoder
 {
     /**
      * @param mixed $data
      * @return mixed|string
      */
-    public function serialize($data)
+    public function encode($data)
     {
         return json_encode($data);
     }
 
     /**
      * @param mixed $data
-     * @throws UnserializedException
+     * @throws DecodedException
      * @return mixed
      */
-    public function unserialize($data)
+    public function decode($data)
     {
         $result = json_decode($data, true);
         if ($result === null && strtolower($data) !== "null") {
-            throw new UnserializedException('JSON cannot be decoded');
+            throw new DecodedException('JSON cannot be decoded');
         }
 
         return $result;

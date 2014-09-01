@@ -9,28 +9,28 @@
  * LICENSE file that was distributed with this source code.
  */
 
-namespace Opensoft\SimpleSerializer\Adapter;
+namespace Opensoft\SimpleSerializer\Encoder;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  */
-interface SerializerAdapterInterface
+interface SerializerEncoder
 {
     /**
-     * Serialize an array
+     * Encode an array
      *
      * @abstract
      * @param mixed $data
      * @return mixed
      */
-    public function serialize($data);
+    public function encode($data);
 
     /**
-     * Unserialize an object with data
+     * Decode an object with data
      *
      * @abstract
-     * @param mixed $data Data to unserialize with
+     * @param mixed $data Data to decode with
      * @return array
      */
-    public function unserialize($data);
+    public function decode($data);
 }

@@ -9,21 +9,19 @@
  * LICENSE file that was distributed with this source code.
  */
 
-namespace Opensoft\SimpleSerializer\Adapter;
+namespace Opensoft\SimpleSerializer\Normalization;
 
-use Opensoft\SimpleSerializer\Adapter\ArrayAdapterInterface as BaseArrayAdapter;
 use Opensoft\SimpleSerializer\Exception\InvalidArgumentException;
 use Opensoft\SimpleSerializer\Exception\RecursionException;
 use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
-use Opensoft\SimpleSerializer\Exclusion\ExclusionStrategyInterface;
-use Opensoft\SimpleSerializer\Exclusion\PropertySkipper;
+use Opensoft\SimpleSerializer\Exclusion\Specification;
 use DateTime;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  */
-class ArrayAdapter implements BaseArrayAdapter
+class ArrayNormalizer implements Normalizer
 {
     const DIRECTION_SERIALIZE = 1;
     const DIRECTION_UNSERIALIZE = 0;
@@ -50,10 +48,10 @@ class ArrayAdapter implements BaseArrayAdapter
      * @param MetadataFactory $metadataFactory
      * @param int $unserializeMode
      */
-    public function __construct(MetadataFactory $metadataFactory, $unserializeMode = self::NON_STRICT_MODE)
+    public function __construct(MetadataFactory $metadataFactory, PropertySkipper $propertySkipper, $unserializeMode = self::NON_STRICT_MODE)
     {
         $this->metadataFactory = $metadataFactory;
-        $this->propertySkipper = new PropertySkipper();
+        $this->propertySkipper = $propertySkipper;
         $this->setUnserializeMode($unserializeMode);
     }
 
@@ -63,7 +61,7 @@ class ArrayAdapter implements BaseArrayAdapter
      * @param object $object
      * @return mixed
      */
-    public function toArray($object)
+    public function normalize($object)
     {
         $result = array();
         $className = $this->getFullClassName($object);
@@ -89,7 +87,7 @@ class ArrayAdapter implements BaseArrayAdapter
      * @param mixed $data
      * @param object $object
      */
-    public function toObject(array $data, $object)
+    public function denormalize(array $data, $object)
     {
         $className = $this->getFullClassName($object);
         $metadata = $this->metadataFactory->getMetadataForClass($className);
@@ -128,31 +126,14 @@ class ArrayAdapter implements BaseArrayAdapter
     /**
      * {@inheritDoc}
      *
-     * @param ExclusionStrategyInterface|null $exclusionStrategy
-     * @return ArrayAdapterInterface
+     * @param Specification $exclusionStrategy
      */
-    public function setExclusionStrategy(ExclusionStrategyInterface $exclusionStrategy = null)
-    {
-        $this->cleanUpExclusionStrategies();
-        if ($exclusionStrategy) {
-            $this->addExclusionStrategy($exclusionStrategy);
-        }
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param ExclusionStrategyInterface $exclusionStrategy
-     * @return ArrayAdapterInterface|void
-     */
-    public function addExclusionStrategy(ExclusionStrategyInterface $exclusionStrategy)
+    public function addExclusionSpecification(Specification $exclusionStrategy)
     {
         $this->propertySkipper->registerStrategy($exclusionStrategy);
     }
 
-    public function cleanUpExclusionStrategies()
+    public function cleanUpExclusionSpecifications()
     {
         $this->propertySkipper->cleanUpStrategies();
     }
@@ -162,7 +143,7 @@ class ArrayAdapter implements BaseArrayAdapter
      *
      * @param boolean $unserializeMode
      * @throws InvalidArgumentException
-     * @return ArrayAdapterInterface
+     * @return ArrayNormalizer
      */
     public function setUnserializeMode($unserializeMode)
     {
@@ -280,7 +261,7 @@ class ArrayAdapter implements BaseArrayAdapter
                 $value = $tmpResult;
                 unset($tmpResult, $tmpType);
             } elseif (is_object($value) && $direct == self::DIRECTION_SERIALIZE) {
-                $value = $this->toArray($value);
+                $value = $this->normalize($value);
             } elseif (is_array($value) && $direct == self::DIRECTION_UNSERIALIZE) {
                 if ($inner) {
                     $innerObject = $object;
@@ -295,7 +276,7 @@ class ArrayAdapter implements BaseArrayAdapter
                         $innerObject = unserialize(sprintf('O:%d:"%s":0:{}', strlen($type), $type));
                     }
                 }
-                $value = $this->toObject($value, $innerObject);
+                $value = $this->denormalize($value, $innerObject);
             } elseif ($type !== null) {
                 throw new InvalidArgumentException(sprintf('Unsupported type: %s', $type));
             }
@@ -362,4 +343,15 @@ class ArrayAdapter implements BaseArrayAdapter
 
         return $dateTimeFormat;
     }
+
+    /**
+     * {@inheritdoc}
+     * @param mixed $object
+     * @return bool
+     */
+    public function supportNormalization($object)
+    {
+        return is_object($object);
+    }
+
 }

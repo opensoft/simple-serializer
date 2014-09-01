@@ -16,8 +16,9 @@ use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A;
-use Opensoft\SimpleSerializer\Exclusion\VersionExclusionStrategy;
-use Opensoft\SimpleSerializer\Exclusion\GroupsExclusionStrategy;
+use Opensoft\SimpleSerializer\Exclusion\VersionSpecification;
+use Opensoft\SimpleSerializer\Exclusion\GroupsSpecification;
+use Opensoft\SimpleSerializer\Normalization\PropertySkipper;
 use DateTime;
 
 /**
@@ -120,22 +121,22 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $a->setStatus(true);
         $a->setHiddenStatus(true);
 
-        $this->unitUnderTest->addExclusionStrategy(new GroupsExclusionStrategy(array('get')));
+        $this->unitUnderTest->addExclusionSpecification(new GroupsSpecification(array('get')));
         $result = $this->unitUnderTest->serialize($a);
         $expectedString = '{"status":true}';
         $this->assertEquals($expectedString, $result);
 
-        $this->unitUnderTest->addExclusionStrategy(new VersionExclusionStrategy('1.5'));
+        $this->unitUnderTest->addExclusionSpecification(new VersionSpecification('1.5'));
         $result = $this->unitUnderTest->serialize($a);
         $expectedString = '{"status":true}';
         $this->assertEquals($expectedString, $result);
 
-        $this->unitUnderTest->addExclusionStrategy(new VersionExclusionStrategy('2.5'));
+        $this->unitUnderTest->addExclusionSpecification(new VersionSpecification('2.5'));
         $result = $this->unitUnderTest->serialize($a);
         $expectedString = '[]';
         $this->assertEquals($expectedString, $result);
 
-        $this->unitUnderTest->cleanUpExclusionStrategies();
+        $this->unitUnderTest->cleanUpExclusionSpecifications();
         $result = $this->unitUnderTest->serialize($a);
         $expectedString = '{"id":1,"name":"name","status":true}';
         $this->assertEquals($expectedString, $result);
@@ -162,6 +163,33 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $result = $this->unitUnderTest->serialize(array($e));
         $expectedString = '[{"rid":3,"object":{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}},"arrayOfObjects":[{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}}]}]';
         $this->assertEquals($expectedString, $result);
+    }
+
+    public function testSerializeSimpleValues()
+    {
+        $data = null;
+        $result = $this->unitUnderTest->serialize($data);
+        $this->assertEquals('null', $result);
+
+        $data = 'null';
+        $result = $this->unitUnderTest->serialize($data);
+        $this->assertEquals('"null"', $result);
+
+        $data = array(null);
+        $result = $this->unitUnderTest->serialize($data, null);
+        $this->assertEquals('[null]', $result);
+
+        $data = array(1,2);
+        $result = $this->unitUnderTest->serialize($data);
+        $this->assertEquals('[1,2]', $result);
+
+        $data = array(array(1),2);
+        $result = $this->unitUnderTest->serialize($data);
+        $this->assertEquals('[[1],2]', $result);
+
+        $data = array('value' => 12, 'array' => array(1, 2, 3));
+        $result = $this->unitUnderTest->serialize($data);
+        $this->assertEquals('{"value":12,"array":[1,2,3]}', $result);
     }
 
     public function testUnserialize()
@@ -466,8 +494,8 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
             array($locator)
         );
         $this->metadataFactory = new MetadataFactory($driver);
-        $arrayAdapter = $this->getMockForAbstractClass('\Opensoft\SimpleSerializer\Adapter\ArrayAdapter', array($this->metadataFactory));
-        $serializerAdapter = $this->getMockForAbstractClass('Opensoft\SimpleSerializer\Adapter\JsonAdapter');
-        $this->unitUnderTest = new Serializer($arrayAdapter, $serializerAdapter);
+        $arrayNormalizer = $this->getMockForAbstractClass('\Opensoft\SimpleSerializer\Normalization\ArrayNormalizer', array($this->metadataFactory, new PropertySkipper()));
+        $serializerEncoder = $this->getMockForAbstractClass('Opensoft\SimpleSerializer\Encoder\JsonEncoder');
+        $this->unitUnderTest = new Serializer($arrayNormalizer, $serializerEncoder);
     }
 }
