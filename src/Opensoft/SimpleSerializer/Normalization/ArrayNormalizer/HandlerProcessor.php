@@ -32,7 +32,7 @@ class HandlerProcessor
      */
     public function process(ArrayNormalizer $normalizer, $value, $property, $direct, $object = null, $inner = false)
     {
-        if($value === null) {
+        if ($value === null) {
             return null;
         }
 

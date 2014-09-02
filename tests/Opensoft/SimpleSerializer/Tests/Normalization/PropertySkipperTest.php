@@ -9,7 +9,7 @@
  * LICENSE file that was distributed with this source code.
  */
 
-namespace Opensoft\SimpleSerializer\Tests\Exclusion;
+namespace Opensoft\SimpleSerializer\Tests\Normalization;
 
 use Opensoft\SimpleSerializer\Normalization\PropertySkipper;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
@@ -41,6 +41,7 @@ class PropertySkipperTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldSkip()
     {
+        $this->propertyMetadata->setExpose(true);
         $this->assertFalse($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
         $skipExclusionGroupSpecification = new GroupsSpecification(array('test1'));
@@ -74,6 +75,9 @@ class PropertySkipperTest extends \PHPUnit_Framework_TestCase
 
         $this->propertySkipper->cleanUpSpecifications();
         $this->assertFalse($this->propertySkipper->shouldSkip($this->propertyMetadata));
+
+        $this->propertyMetadata->setExpose(false);
+        $this->assertTrue($this->propertySkipper->shouldSkip($this->propertyMetadata));
     }
 
     protected function setUp()

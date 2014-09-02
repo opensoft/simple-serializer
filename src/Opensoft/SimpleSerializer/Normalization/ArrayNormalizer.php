@@ -75,7 +75,7 @@ class ArrayNormalizer implements Normalizer
         $className = ObjectHandler::getFullClassName($object);
         $metadata = $this->metadataFactory->getMetadataForClass($className);
         foreach ($metadata->getProperties() as $property) {
-            if (!$property->isExpose() || $this->propertySkipper->shouldSkip($property)) {
+            if ($this->propertySkipper->shouldSkip($property)) {
                 continue;
             }
 
@@ -102,7 +102,7 @@ class ArrayNormalizer implements Normalizer
         $metadata = $this->metadataFactory->getMetadataForClass($className);
         $unserializedProperties = 0;
         foreach ($metadata->getProperties() as $property) {
-            if (!$property->isExpose() || $this->propertySkipper->shouldSkip($property)) {
+            if ($this->propertySkipper->shouldSkip($property)) {
                 if ($this->isMediumStrictUnserializeMode() && array_key_exists($property->getSerializedName(), $data)) {
                     throw new InvalidArgumentException(sprintf('%s extra field', $property->getSerializedName()));
                 }

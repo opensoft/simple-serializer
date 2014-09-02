@@ -25,11 +25,11 @@ class ArrayHandler
      */
     private $processor;
 
-
     public function __construct(HandlerProcessor $processor)
     {
         $this->processor = $processor;
     }
+
     /**
      * @param ArrayNormalizer $normalizer
      * @param mixed $value

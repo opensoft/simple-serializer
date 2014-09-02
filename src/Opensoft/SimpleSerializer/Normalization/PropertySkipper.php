@@ -53,6 +53,9 @@ final class PropertySkipper
      */
     public function shouldSkip(PropertyMetadata $property)
     {
+        if (!$property->isExpose()) {
+            return true;
+        }
         foreach ($this->specifications as $specification) {
             if ($specification->isSatisfiedBy($property)) {
                 return true;
