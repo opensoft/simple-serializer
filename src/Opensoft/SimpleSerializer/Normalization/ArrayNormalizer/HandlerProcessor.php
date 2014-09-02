@@ -32,34 +32,36 @@ class HandlerProcessor
      */
     public function process(ArrayNormalizer $normalizer, $value, $property, $direct, $object = null, $inner = false)
     {
+        if($value === null) {
+            return null;
+        }
+
         $type = $property->getType();
 
-        if ($value !== null) {
-            if ($type === 'string') {
-                $value = (string)$value;
-            } elseif ($type === 'boolean') {
-                $value = (boolean)$value;
-            } elseif ($type === 'integer') {
-                $value = (integer)$value;
-            } elseif ($type === 'double') {
-                $value = (double)$value;
-            } elseif ($type === 'DateTime' || ($type[0] === 'D' && strpos($type, 'DateTime<') === 0)) {
-                $dateHandler = new DateTimeHandler();
-                $value= $dateHandler->handle($value, $type, $direct);
-                unset($dateHandler);
-            } elseif ($type === 'array' || ($type[0] === 'a' && strpos($type, 'array<') === 0)) {
-                $arrayHandler = new ArrayHandler($this);
-                $value = $arrayHandler->handle($normalizer, $value, $type, $property, $direct, $object);
-                unset($arrayHandler);
-            } elseif (is_object($value) && $direct == ArrayNormalizer::DIRECTION_SERIALIZE) {
-                $value = $normalizer->normalize($value);
-            } elseif (is_array($value) && $direct == ArrayNormalizer::DIRECTION_UNSERIALIZE) {
-                $innerObjectHandler = new InnerObjectHandler();
-                $value = $innerObjectHandler->handle($normalizer, $value, $type, $property, $object, $inner);
-                unset($innerObjectHandler);
-            } elseif ($type !== null) {
-                throw new InvalidArgumentException(sprintf('Unsupported type: %s', $type));
-            }
+        if ($type === 'string') {
+            $value = (string)$value;
+        } elseif ($type === 'boolean') {
+           $value = (boolean)$value;
+        } elseif ($type === 'integer') {
+           $value = (integer)$value;
+        } elseif ($type === 'double') {
+           $value = (double)$value;
+        } elseif ($type === 'DateTime' || ($type[0] === 'D' && strpos($type, 'DateTime<') === 0)) {
+           $dateHandler = new DateTimeHandler();
+           $value= $dateHandler->handle($value, $type, $direct);
+           unset($dateHandler);
+        } elseif ($type === 'array' || ($type[0] === 'a' && strpos($type, 'array<') === 0)) {
+           $arrayHandler = new ArrayHandler($this);
+           $value = $arrayHandler->handle($normalizer, $value, $type, $property, $direct, $object);
+           unset($arrayHandler);
+        } elseif (is_object($value) && $direct == ArrayNormalizer::DIRECTION_SERIALIZE) {
+           $value = $normalizer->normalize($value);
+        } elseif (is_array($value) && $direct == ArrayNormalizer::DIRECTION_UNSERIALIZE) {
+           $innerObjectHandler = new InnerObjectHandler();
+           $value = $innerObjectHandler->handle($normalizer, $value, $type, $property, $object, $inner);
+           unset($innerObjectHandler);
+        } elseif ($type !== null) {
+           throw new InvalidArgumentException(sprintf('Unsupported type: %s', $type));
         }
 
         return $value;
