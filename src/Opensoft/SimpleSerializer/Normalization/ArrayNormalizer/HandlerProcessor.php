@@ -27,7 +27,7 @@ class HandlerProcessor
      * @param int $direct
      * @param null|mixed $object
      * @param bool $inner
-     * @throws \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return array|bool|float|int|string|null
      */
     public function process(ArrayNormalizer $normalizer, $value, $property, $direct, $object = null, $inner = false)
@@ -64,4 +64,4 @@ class HandlerProcessor
 
         return $value;
     }
-} 
+}

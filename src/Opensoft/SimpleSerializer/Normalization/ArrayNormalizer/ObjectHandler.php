@@ -23,7 +23,7 @@ class ObjectHandler
      * @param $object
      * @param $property
      * @return mixed
-     * @throws \Opensoft\SimpleSerializer\Exception\RecursionException
+     * @throws RecursionException
      */
     public static function serializationHandle($object, $property)
     {
@@ -59,7 +59,7 @@ class ObjectHandler
     /**
      * @param object $object
      * @return string
-     * @throws \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public static function getFullClassName($object)
     {
@@ -69,4 +69,4 @@ class ObjectHandler
 
         return get_class($object);
     }
-} 
+}

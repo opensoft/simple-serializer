@@ -37,7 +37,7 @@ class ArrayHandler
      * @param PropertyMetadata $property
      * @param int $direct
      * @param null|mixed $object
-     * @throws \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return array|bool|float|int|string|null
      */
     public function handle(ArrayNormalizer $normalizer, $value, $type, $property, $direct, $object = null)
@@ -66,4 +66,4 @@ class ArrayHandler
 
         return $tmpResult;
     }
-} 
+}

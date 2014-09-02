@@ -35,4 +35,4 @@ class InnerObjectHandler
         }
         return $normalizer->denormalize($value, $innerObject);
     }
-} 
+}
