@@ -2,10 +2,11 @@ Simple-Serializer
 ================
 
 
-[![Build Status](https://secure.travis-ci.org/opensoft/simple-serializer.png?branch=master)](http://travis-ci.org/opensoft/simple-serializer)
+[![Build Status](https://secure.travis-ci.org/opensoft/simple-serializer.png?branch=develop)](http://travis-ci.org/opensoft/simple-serializer)
 [![Total Downloads](https://poser.pugx.org/opensoft/simple-serializer/downloads.png)](https://packagist.org/packages/opensoft/simple-serializer)
 [![Latest Stable Version](https://poser.pugx.org/opensoft/simple-serializer/v/stable.png)](https://packagist.org/packages/opensoft/simple-serializer)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/opensoft/simple-serializer/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/opensoft/simple-serializer/?branch=develop)
+[![Code Coverage](https://scrutinizer-ci.com/g/opensoft/simple-serializer/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/opensoft/simple-serializer/?branch=develop)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/950193f2-a3a7-4117-a267-e4b1c95fe5b3/mini.png)](https://insight.sensiolabs.com/projects/950193f2-a3a7-4117-a267-e4b1c95fe5b3)
 
 Introduction
