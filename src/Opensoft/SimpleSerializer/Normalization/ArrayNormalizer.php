@@ -16,7 +16,7 @@ use Opensoft\SimpleSerializer\Exception\RecursionException;
 use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 use Opensoft\SimpleSerializer\Exclusion\Specification;
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\ObjectHandler;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\ObjectHelper;
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DateTimeHandler;
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\HandlerProcessor;
 
@@ -55,11 +55,11 @@ class ArrayNormalizer implements Normalizer
      * @param MetadataFactory $metadataFactory
      * @param int $unserializeMode
      */
-    public function __construct(MetadataFactory $metadataFactory, PropertySkipper $propertySkipper, $unserializeMode = self::NON_STRICT_MODE)
+    public function __construct(MetadataFactory $metadataFactory, PropertySkipper $propertySkipper, HandlerProcessor $handlerProcessor, $unserializeMode = self::NON_STRICT_MODE)
     {
         $this->metadataFactory = $metadataFactory;
         $this->propertySkipper = $propertySkipper;
-        $this->valueHandleProcessor = new HandlerProcessor();
+        $this->valueHandleProcessor = $handlerProcessor;
         $this->setUnserializeMode($unserializeMode);
     }
 
@@ -72,16 +72,16 @@ class ArrayNormalizer implements Normalizer
     public function normalize($object)
     {
         $result = array();
-        $className = ObjectHandler::getFullClassName($object);
+        $className = ObjectHelper::getFullClassName($object);
         $metadata = $this->metadataFactory->getMetadataForClass($className);
         foreach ($metadata->getProperties() as $property) {
             if ($this->propertySkipper->shouldSkip($property)) {
                 continue;
             }
 
-            $value = ObjectHandler::serializationHandle($object, $property);
+            $value = ObjectHelper::expose($object, $property);
 
-            $value = $this->valueHandleProcessor->process($this, $value, $property, self::DIRECTION_SERIALIZE);
+            $value = $this->valueHandleProcessor->normalizeProcess($this, $value, $property);
             $result[$property->getSerializedName()] = $value;
         }
 
@@ -98,7 +98,7 @@ class ArrayNormalizer implements Normalizer
      */
     public function denormalize(array $data, $object)
     {
-        $className = ObjectHandler::getFullClassName($object);
+        $className = ObjectHelper::getFullClassName($object);
         $metadata = $this->metadataFactory->getMetadataForClass($className);
         $unserializedProperties = 0;
         foreach ($metadata->getProperties() as $property) {
@@ -115,13 +115,13 @@ class ArrayNormalizer implements Normalizer
                 }
                 continue;
             }
-            $value = $this->valueHandleProcessor->process($this, $data[$property->getSerializedName()], $property, self::DIRECTION_UNSERIALIZE, $object);
+            $value = $this->valueHandleProcessor->denormalizeProcess($this, $data[$property->getSerializedName()], $property, $object);
 
             if ($value === $object) {
                 throw new RecursionException(sprintf('Invalid self reference detected. %s::%s', $className, $property->getName()));
             }
 
-            ObjectHandler::unserializationHandle($object, $property, $value);
+            ObjectHelper::involve($object, $property, $value);
             $unserializedProperties ++;
         }
 

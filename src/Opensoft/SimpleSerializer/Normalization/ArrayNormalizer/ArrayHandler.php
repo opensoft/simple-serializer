@@ -11,6 +11,7 @@
 
 namespace Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 
+use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 
@@ -18,52 +19,82 @@ use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-class ArrayHandler
+class ArrayHandler implements Handler
 {
     /**
      * @var HandlerProcessor
      */
     private $processor;
 
-    public function __construct(HandlerProcessor $processor)
+    /**
+     * @var ArrayNormalizer
+     */
+    private $normalizer;
+
+    /**
+     * @param ArrayNormalizer $normalizer
+     * @param HandlerProcessor $processor
+     */
+    public function __construct(ArrayNormalizer $normalizer, HandlerProcessor $processor)
     {
+        $this->normalizer = $normalizer;
         $this->processor = $processor;
     }
 
     /**
-     * @param ArrayNormalizer $normalizer
      * @param mixed $value
-     * @param string $type
      * @param PropertyMetadata $property
-     * @param int $direct
-     * @param null|mixed $object
-     * @throws InvalidArgumentException
+     *
      * @return array|bool|float|int|string|null
      */
-    public function handle(ArrayNormalizer $normalizer, $value, $type, $property, $direct, $object = null)
+    public function normalizationHandle($value, $property)
     {
-        $tmpResult = array();
-        $tmpType = new PropertyMetadata($property->getName());
-        $tmpType->setExpose(true)->setSerializedName($property->getSerializedName());
-        if (preg_match('/array<(?<type>[a-zA-Z\\\]+)>/', $type, $matches)) {
-            $tmpType->setType($matches['type']);
-        }
-        if ($direct == ArrayNormalizer::DIRECTION_UNSERIALIZE) {
-            $existsData = ObjectHandler::serializationHandle($object, $property);
-        }
-        $inner = false;
+        $result = array();
+        $itemProperty = $this->makeItemProperty($property);
 
         foreach ($value as $subKey => $subValue) {
+            $result[$subKey] = $this->processor->normalizeProcess($this->normalizer, $subValue, $itemProperty);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param mixed $value
+     * @param PropertyMetadata $property
+     * @param $object
+     */
+    public function denormalizationHandle($value, $property, $object)
+    {
+        $result = array();
+        $itemProperty = $this->makeItemProperty($property);
+        $existsData = ObjectHelper::expose($object, $property);
+        $inner = false;
+        foreach ($value as $subKey => $subValue) {
             $tmpObject = $object;
-            if ($direct == ArrayNormalizer::DIRECTION_UNSERIALIZE && isset($existsData[$subKey]) && is_object($existsData[$subKey])) {
+            if (isset($existsData[$subKey]) && is_object($existsData[$subKey])) {
                 $tmpObject = $existsData[$subKey];
                 $inner = true;
             }
-            $subValue = $this->processor->process($normalizer, $subValue, $tmpType, $direct, $tmpObject, $inner);
-            $tmpResult[$subKey] = $subValue;
+            $result[$subKey] = $this->processor->denormalizeProcess($this->normalizer, $subValue, $itemProperty, $tmpObject, $inner);
             unset($tmpObject);
         }
 
-        return $tmpResult;
+        return $result;
+    }
+
+    /**
+     * @param PropertyMetadata $property
+     * @return PropertyMetadata
+     */
+    private function makeItemProperty(PropertyMetadata $property)
+    {
+        $itemProperty = new PropertyMetadata($property->getName());
+        $itemProperty->setExpose(true)->setSerializedName($property->getSerializedName());
+        if (preg_match('/array<(?<type>[a-zA-Z\\\]+)>/', $property->getType(), $matches)) {
+            $itemProperty->setType($matches['type']);
+        }
+
+        return $itemProperty;
     }
 }

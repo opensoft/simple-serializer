@@ -14,37 +14,22 @@ namespace Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 use DateTime;
 use Opensoft\SimpleSerializer\Exception\InvalidArgumentException;
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
+use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-class DateTimeHandler
+class DateTimeHandler implements Handler
 {
     /**
-     *
-     * @param mixed $value
-     * @param string $type
-     * @param int $direct
-     * @return mixed
-     */
-    public function handle($value, $type, $direct)
-    {
-        if ($direct == ArrayNormalizer::DIRECTION_SERIALIZE) {
-            return $this->serializationHandle($value,$type);
-        } elseif ($direct == ArrayNormalizer::DIRECTION_UNSERIALIZE) {
-            return $this->unserializationHandle($value, $type);
-        }
-    }
-
-    /**
      * @param DateTime $value
-     * @param string $type
+     * @param PropertyMetadata $property
      * @return string
      */
-    public function serializationHandle(DateTime $value, $type)
+    public function normalizationHandle($value, $property)
     {
-        $dateTimeFormat = $this->extractDateTimeFormat($type, DateTime::ISO8601);
+        $dateTimeFormat = $this->extractDateTimeFormat($property->getType(), DateTime::ISO8601);
 
         return $value->format($dateTimeFormat);
     }
@@ -52,17 +37,18 @@ class DateTimeHandler
     /**
      * Convert serialized value to DateTime object
      * @param string $value
-     * @param string $type
+     * @param PropertyMetadata $property
+     * @param mixed $object
      * @return DateTime
      * @throws InvalidArgumentException
      */
-    public function unserializationHandle($value, $type)
+    public function denormalizationHandle($value, $property, $object)
     {
         // we should not allow empty string as date time argument.
         //It can lead us to unexpected results
         //Only 'null' is possible empty value
         if ($originalValue = trim($value)) {
-            $dateTimeFormat = $this->extractDateTimeFormat($type);
+            $dateTimeFormat = $this->extractDateTimeFormat($property->getType());
             try {
                 $value = new DateTime($value);
             } catch (\Exception $e) {

@@ -11,19 +11,57 @@
 namespace Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
+use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-class InnerObjectHandler
+class InnerObjectHandler implements Handler
 {
-    public function handle(ArrayNormalizer $normalizer, $value, $type, $property, $object, $inner)
+    /**
+     * @var ArrayNormalizer
+     */
+    private $normalizer;
+
+    /**
+     * @var bool
+     */
+    private $inner;
+
+    /**
+     * @param ArrayNormalizer $normalizer
+     * @param bool $inner
+     */
+    public function __construct(ArrayNormalizer $normalizer, $inner = false)
     {
-        if ($inner) {
+        $this->normalizer = $normalizer;
+        $this->inner = $inner;
+    }
+
+    /**
+     * @param mixed $value
+     * @param PropertyMetadata $property
+     * @return mixed
+     */
+    public function normalizationHandle($value, $property)
+    {
+        return $this->normalizer->normalize($value);
+    }
+
+    /**
+     * @param mixed $value
+     * @param PropertyMetadata $property
+     * @param object $object
+     * @return object
+     */
+    public function denormalizationHandle($value, $property, $object)
+    {
+        $type = $property->getType();
+        if ($this->inner) {
             $innerObject = $object;
         } else {
-            $innerObject = ObjectHandler::serializationHandle($object, $property);
+            $innerObject = ObjectHelper::expose($object, $property);
         }
         if (!is_object($innerObject) || !$innerObject instanceof $type) {
             if (PHP_VERSION_ID >= 50400) {
@@ -33,6 +71,6 @@ class InnerObjectHandler
                 $innerObject = unserialize(sprintf('O:%d:"%s":0:{}', strlen($type), $type));
             }
         }
-        return $normalizer->denormalize($value, $innerObject);
+        return $this->normalizer->denormalize($value, $innerObject);
     }
 }

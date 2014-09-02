@@ -24,13 +24,10 @@ class HandlerProcessor
      * @param ArrayNormalizer $normalizer
      * @param mixed $value
      * @param PropertyMetadata $property
-     * @param int $direct
-     * @param null|mixed $object
-     * @param bool $inner
+     * @return array|bool|float|int|null|string
      * @throws InvalidArgumentException
-     * @return array|bool|float|int|string|null
      */
-    public function process(ArrayNormalizer $normalizer, $value, $property, $direct, $object = null, $inner = false)
+    public function normalizeProcess(ArrayNormalizer $normalizer, $value, $property)
     {
         if ($value === null) {
             return null;
@@ -41,27 +38,69 @@ class HandlerProcessor
         if ($type === 'string') {
             $value = (string)$value;
         } elseif ($type === 'boolean') {
-           $value = (boolean)$value;
+            $value = (boolean)$value;
         } elseif ($type === 'integer') {
-           $value = (integer)$value;
+            $value = (integer)$value;
         } elseif ($type === 'double') {
-           $value = (double)$value;
+            $value = (double)$value;
         } elseif ($type === 'DateTime' || ($type[0] === 'D' && strpos($type, 'DateTime<') === 0)) {
-           $dateHandler = new DateTimeHandler();
-           $value= $dateHandler->handle($value, $type, $direct);
-           unset($dateHandler);
+            $dateHandler = new DateTimeHandler();
+            $value= $dateHandler->normalizationHandle($value, $property);
+            unset($dateHandler);
         } elseif ($type === 'array' || ($type[0] === 'a' && strpos($type, 'array<') === 0)) {
-           $arrayHandler = new ArrayHandler($this);
-           $value = $arrayHandler->handle($normalizer, $value, $type, $property, $direct, $object);
-           unset($arrayHandler);
-        } elseif (is_object($value) && $direct == ArrayNormalizer::DIRECTION_SERIALIZE) {
-           $value = $normalizer->normalize($value);
-        } elseif (is_array($value) && $direct == ArrayNormalizer::DIRECTION_UNSERIALIZE) {
-           $innerObjectHandler = new InnerObjectHandler();
-           $value = $innerObjectHandler->handle($normalizer, $value, $type, $property, $object, $inner);
-           unset($innerObjectHandler);
+            $arrayHandler = new ArrayHandler($normalizer, $this);
+            $value = $arrayHandler->normalizationHandle($value, $property);
+            unset($arrayHandler);
+        } elseif (is_object($value)) {
+            $innerObjectHandler = new InnerObjectHandler($normalizer);
+            $value = $innerObjectHandler->normalizationHandle($value, $property);
+            unset($innerObjectHandler);
         } elseif ($type !== null) {
-           throw new InvalidArgumentException(sprintf('Unsupported type: %s', $type));
+            throw new InvalidArgumentException(sprintf('Unsupported type: %s', $type));
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param ArrayNormalizer $normalizer
+     * @param mixed $value
+     * @param PropertyMetadata $property
+     * @param mixed $object
+     * @param bool $inner
+     * @return array|bool|\DateTime|float|int|null|string
+     * @throws InvalidArgumentException
+     */
+    public function denormalizeProcess(ArrayNormalizer $normalizer, $value, $property, $object, $inner = false)
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $type = $property->getType();
+
+        if ($type === 'string') {
+            $value = (string)$value;
+        } elseif ($type === 'boolean') {
+            $value = (boolean)$value;
+        } elseif ($type === 'integer') {
+            $value = (integer)$value;
+        } elseif ($type === 'double') {
+            $value = (double)$value;
+        } elseif ($type === 'DateTime' || ($type[0] === 'D' && strpos($type, 'DateTime<') === 0)) {
+            $dateHandler = new DateTimeHandler();
+            $value = $dateHandler->denormalizationHandle($value, $property, $object);
+            unset($dateHandler);
+        } elseif ($type === 'array' || ($type[0] === 'a' && strpos($type, 'array<') === 0)) {
+            $arrayHandler = new ArrayHandler($normalizer, $this);
+            $value = $arrayHandler->denormalizationHandle($value, $property, $object);
+            unset($arrayHandler);
+        } elseif (is_array($value)) {
+            $innerObjectHandler = new InnerObjectHandler($normalizer, $inner);
+            $value = $innerObjectHandler->denormalizationHandle($value, $property, $object);
+            unset($innerObjectHandler);
+        } elseif ($type !== null) {
+            throw new InvalidArgumentException(sprintf('Unsupported type: %s', $type));
         }
 
         return $value;

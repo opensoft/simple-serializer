@@ -17,7 +17,7 @@ use Opensoft\SimpleSerializer\Exception\InvalidArgumentException;
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-class ObjectHandler
+class ObjectHelper
 {
     /**
      * @param $object
@@ -25,7 +25,7 @@ class ObjectHandler
      * @return mixed
      * @throws RecursionException
      */
-    public static function serializationHandle($object, $property)
+    public static function expose($object, $property)
     {
         $attributes = get_object_vars($object);
         if (array_key_exists($propertyName = $property->getName(), $attributes)) {
@@ -46,7 +46,7 @@ class ObjectHandler
      * @param $property
      * @param $value
      */
-    public static function unserializationHandle($object, $property, $value)
+    public static function involve($object, $property, $value)
     {
         $attributes = get_object_vars($object);
         if (array_key_exists($propertyName = $property->getName(), $attributes)) {

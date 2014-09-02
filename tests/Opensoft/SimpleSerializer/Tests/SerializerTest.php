@@ -19,6 +19,7 @@ use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A;
 use Opensoft\SimpleSerializer\Exclusion\VersionSpecification;
 use Opensoft\SimpleSerializer\Exclusion\GroupsSpecification;
 use Opensoft\SimpleSerializer\Normalization\PropertySkipper;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\HandlerProcessor;
 use DateTime;
 
 /**
@@ -494,7 +495,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
             array($locator)
         );
         $this->metadataFactory = new MetadataFactory($driver);
-        $arrayNormalizer = $this->getMockForAbstractClass('\Opensoft\SimpleSerializer\Normalization\ArrayNormalizer', array($this->metadataFactory, new PropertySkipper()));
+        $arrayNormalizer = $this->getMockForAbstractClass('\Opensoft\SimpleSerializer\Normalization\ArrayNormalizer', array($this->metadataFactory, new PropertySkipper(), new HandlerProcessor()));
         $serializerEncoder = $this->getMockForAbstractClass('Opensoft\SimpleSerializer\Encoder\JsonEncoder');
         $this->unitUnderTest = new Serializer($arrayNormalizer, $serializerEncoder);
     }
