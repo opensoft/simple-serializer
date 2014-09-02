@@ -1,0 +1,46 @@
+filter:
+    excluded_paths:
+        - 'vendor/*'
+        - 'app/*'
+        - 'web/*'
+    paths: {  }
+tools:
+    php_cpd:
+        enabled: true
+        excluded_dirs: {  }
+        names:
+            - '*.php'
+        min_lines: 5
+        min_tokens: 70
+        filter:
+            excluded_paths:
+                - 'vendor/*'
+            paths: {  }
+    php_pdepend:
+        excluded_dirs:
+            - vendor
+            - tests
+        enabled: true
+        configuration_file: null
+        suffixes:
+            - php
+        filter:
+            excluded_paths:
+                - 'vendor/*'
+                - 'app/*'
+                - 'web/*'
+            paths: {  }
+    php_changetracking:
+        enabled: true
+        bug_patterns:
+            - '\bfix(?:es|ed)?\b'
+        feature_patterns:
+            - '\badd(?:s|ed)?\b'
+            - '\bimplement(?:s|ed)?\b'
+        filter:
+            excluded_paths:
+                - 'vendor/*'
+            paths: {  }
+    external_code_coverage:
+        timeout: 600
+build_failure_conditions: {  }
