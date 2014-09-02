@@ -37,10 +37,10 @@ interface Normalizer
     public function denormalize(array $data, $object);
 
     /**
-     * @param Specification $exclusionStrategy
+     * @param Specification $exclusionSpecification
      * @return Normalizer
      */
-    public function addExclusionSpecification(Specification $exclusionStrategy);
+    public function addExclusionSpecification(Specification $exclusionSpecification);
 
     public function cleanUpExclusionSpecifications();
 

@@ -17,7 +17,7 @@ use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  */
-class VersionExclusionStrategyTest extends \PHPUnit_Framework_TestCase
+class VersionExclusionSpecificationTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {

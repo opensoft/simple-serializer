@@ -34,7 +34,7 @@ namespace Opensoft\SimpleSerializer\Exclusion;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 
 /**
- * Interface for exclusion strategies.
+ * Interface for exclusion specifications.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>

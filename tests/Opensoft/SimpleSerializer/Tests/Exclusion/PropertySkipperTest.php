@@ -43,36 +43,36 @@ class PropertySkipperTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
-        $skipExclusionGroupStrategy = new GroupsSpecification(array('test1'));
-        $this->propertySkipper->registerStrategy($skipExclusionGroupStrategy);
+        $skipExclusionGroupSpecification = new GroupsSpecification(array('test1'));
+        $this->propertySkipper->registerSpecification($skipExclusionGroupSpecification);
         $this->assertTrue($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
-        $nonSkipExclusionGroupStrategy = new GroupsSpecification(array('test'));
-        $this->propertySkipper->registerStrategy($nonSkipExclusionGroupStrategy);
+        $nonSkipExclusionGroupSpecification = new GroupsSpecification(array('test'));
+        $this->propertySkipper->registerSpecification($nonSkipExclusionGroupSpecification);
         $this->assertTrue($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
-        $this->propertySkipper->cleanUpStrategies();
+        $this->propertySkipper->cleanUpSpecifications();
 
-        $this->propertySkipper->registerStrategy($nonSkipExclusionGroupStrategy);
+        $this->propertySkipper->registerSpecification($nonSkipExclusionGroupSpecification);
         $this->assertFalse($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
-        $skipExclusionVersionStrategy = new VersionSpecification('5.5');
-        $this->propertySkipper->registerStrategy($skipExclusionVersionStrategy);
+        $skipExclusionVersionSpecification = new VersionSpecification('5.5');
+        $this->propertySkipper->registerSpecification($skipExclusionVersionSpecification);
         $this->assertTrue($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
-        $nonSkipExclusionVersionStrategy = new VersionSpecification('5.1');
-        $this->propertySkipper->registerStrategy($nonSkipExclusionVersionStrategy);
+        $nonSkipExclusionVersionSpecification = new VersionSpecification('5.1');
+        $this->propertySkipper->registerSpecification($nonSkipExclusionVersionSpecification);
         $this->assertTrue($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
-        $this->propertySkipper->cleanUpStrategies();
+        $this->propertySkipper->cleanUpSpecifications();
 
-        $this->propertySkipper->registerStrategy($nonSkipExclusionGroupStrategy);
+        $this->propertySkipper->registerSpecification($nonSkipExclusionGroupSpecification);
         $this->assertFalse($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
-        $this->propertySkipper->registerStrategy($skipExclusionGroupStrategy);
+        $this->propertySkipper->registerSpecification($skipExclusionGroupSpecification);
         $this->assertTrue($this->propertySkipper->shouldSkip($this->propertyMetadata));
 
-        $this->propertySkipper->cleanUpStrategies();
+        $this->propertySkipper->cleanUpSpecifications();
         $this->assertFalse($this->propertySkipper->shouldSkip($this->propertyMetadata));
     }
 

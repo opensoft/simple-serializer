@@ -22,29 +22,29 @@ final class PropertySkipper
     /**
      * @var Specification[]
      */
-    private $strategies = array();
+    private $specifications = array();
 
     /**
-     * @param Specification[] $strategies
+     * @param Specification[] $specifications
      */
-    public function __construct($strategies = array())
+    public function __construct($specifications = array())
     {
-        foreach ($strategies as $strategy) {
-            $this->registerStrategy($strategy);
+        foreach ($specifications as $specification) {
+            $this->registerSpecification($specification);
         }
     }
 
     /**
-     * @param Specification $strategy
+     * @param Specification $specification
      */
-    public function registerStrategy(Specification $strategy)
+    public function registerSpecification(Specification $specification)
     {
-        $this->strategies[] = $strategy;
+        $this->specifications[] = $specification;
     }
 
-    public function cleanUpStrategies()
+    public function cleanUpSpecifications()
     {
-        $this->strategies = array();
+        $this->specifications = array();
     }
 
     /**
@@ -53,8 +53,8 @@ final class PropertySkipper
      */
     public function shouldSkip(PropertyMetadata $property)
     {
-        foreach ($this->strategies as $strategy) {
-            if ($strategy->isSatisfiedBy($property)) {
+        foreach ($this->specifications as $specification) {
+            if ($specification->isSatisfiedBy($property)) {
                 return true;
             }
         }
