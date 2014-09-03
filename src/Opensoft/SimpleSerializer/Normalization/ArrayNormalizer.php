@@ -116,11 +116,6 @@ class ArrayNormalizer implements Normalizer
                 continue;
             }
             $value = $this->valueHandleProcessor->denormalizeProcess($this, $data[$property->getSerializedName()], $property, $object);
-
-            if ($value === $object) {
-                throw new RecursionException(sprintf('Invalid self reference detected. %s::%s', $className, $property->getName()));
-            }
-
             ObjectHelper::involve($object, $property, $value);
             $unserializedProperties ++;
         }

@@ -48,6 +48,10 @@ class ObjectHelper
      */
     public static function involve($object, $property, $value)
     {
+        if ($value === $object) {
+            throw new RecursionException(sprintf('Invalid self reference detected. %s::%s', self::getFullClassName($object), $property->getName()));
+        }
+
         $attributes = get_object_vars($object);
         if (array_key_exists($propertyName = $property->getName(), $attributes)) {
             $object->$propertyName = $value;

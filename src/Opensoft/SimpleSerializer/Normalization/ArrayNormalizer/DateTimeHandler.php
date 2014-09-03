@@ -47,25 +47,24 @@ class DateTimeHandler implements Handler
         // we should not allow empty string as date time argument.
         //It can lead us to unexpected results
         //Only 'null' is possible empty value
-        if ($originalValue = trim($value)) {
-            $dateTimeFormat = $this->extractDateTimeFormat($property->getType());
-            try {
-                $value = new DateTime($value);
-            } catch (\Exception $e) {
-                throw new InvalidArgumentException(sprintf('Invalid DateTime argument "%s"', $value), $e->getCode(), $e);
-            }
-            // if format was specified in metadata - format and compare parsed DateTime object with original string
-            if (isset($dateTimeFormat) && $value->format($dateTimeFormat) !== $originalValue) {
-                throw new InvalidArgumentException(sprintf('Invalid DateTime argument "%s"', $originalValue));
-            }
-
-            return $value;
-        }
-        else {
+        $originalValue = trim($value);
+        if (!$originalValue) {
             throw new InvalidArgumentException('DateTime argument should be well formed string');
         }
-    }
 
+        $dateTimeFormat = $this->extractDateTimeFormat($property->getType());
+        try {
+            $value = new DateTime($value);
+        } catch (\Exception $e) {
+            throw new InvalidArgumentException(sprintf('Invalid DateTime argument "%s"', $value), $e->getCode(), $e);
+        }
+        // if format was specified in metadata - format and compare parsed DateTime object with original string
+        if (isset($dateTimeFormat) && $value->format($dateTimeFormat) !== $originalValue) {
+            throw new InvalidArgumentException(sprintf('Invalid DateTime argument "%s"', $originalValue));
+        }
+
+        return $value;
+    }
 
     /**
      * Extracts specified date time format from given source
@@ -89,3 +88,4 @@ class DateTimeHandler implements Handler
         return $dateTimeFormat;
     }
 }
+
