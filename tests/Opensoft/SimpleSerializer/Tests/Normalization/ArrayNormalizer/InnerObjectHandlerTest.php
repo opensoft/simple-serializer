@@ -25,12 +25,7 @@ class InnerObjectHandlerTest extends BaseTest
     /**
      * @var InnerObjectHandler
      */
-    private $innerHandler;
-
-    /**
-     * @var InnerObjectHandler
-     */
-    private $nonInnerHandler;
+    private $handler;
 
     /**
      * @dataProvider childrenDataProvider
@@ -39,7 +34,7 @@ class InnerObjectHandlerTest extends BaseTest
      */
     public function testNormalization($aChildren, $aChildrenAsArray)
     {
-        $normalizedChildren = $this->innerHandler->normalizationHandle($aChildren, new PropertyMetadata('children'));
+        $normalizedChildren = $this->handler->normalizationHandle($aChildren, new PropertyMetadata('children'));
         $this->assertEquals($aChildrenAsArray, $normalizedChildren);
     }
 
@@ -52,18 +47,13 @@ class InnerObjectHandlerTest extends BaseTest
     {
         $object = new AChildren();
         $property = $this->makeSimpleProperty('children', 'Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren');
-        $this->innerHandler->denormalizationHandle($aChildrenAsArray, $property, $object);
+        $this->handler->denormalizationHandle($aChildrenAsArray, $property, $object);
         $this->assertEquals($aChildren, $object);
 
-        $object = $this->innerHandler->denormalizationHandle($aChildrenAsArray, $property, 1);
+        $object = $this->handler->denormalizationHandle($aChildrenAsArray, $property, 1);
         $this->assertEquals($aChildren, $object);
 
-        $object = $this->innerHandler->denormalizationHandle($aChildrenAsArray, $property, new A(), true);
-        $this->assertEquals($aChildren, $object);
-
-        $parent = new \stdClass();
-        $parent->children = new AChildren();
-        $object = $this->nonInnerHandler->denormalizationHandle($aChildrenAsArray, $property, $parent);
+        $object = $this->handler->denormalizationHandle($aChildrenAsArray, $property, new A(), true);
         $this->assertEquals($aChildren, $object);
     }
 
@@ -73,7 +63,6 @@ class InnerObjectHandlerTest extends BaseTest
     protected function setUp()
     {
         $this->initializeNormalizer();
-        $this->innerHandler = new InnerObjectHandler($this->normalizer, true);
-        $this->nonInnerHandler = new InnerObjectHandler($this->normalizer, false);
+        $this->handler = new InnerObjectHandler($this->normalizer);
     }
 }

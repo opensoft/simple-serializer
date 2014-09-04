@@ -25,18 +25,12 @@ class InnerObjectHandler implements Handler
     private $normalizer;
 
     /**
-     * @var bool
-     */
-    private $inner;
-
-    /**
      * @param ArrayNormalizer $normalizer
      * @param bool $inner
      */
-    public function __construct(ArrayNormalizer $normalizer, $inner = false)
+    public function __construct(ArrayNormalizer $normalizer)
     {
         $this->normalizer = $normalizer;
-        $this->inner = $inner;
     }
 
     /**
@@ -58,19 +52,15 @@ class InnerObjectHandler implements Handler
     public function denormalizationHandle($value, $property, $object)
     {
         $type = $property->getType();
-        if ($this->inner) {
-            $innerObject = $object;
-        } else {
-            $innerObject = ObjectHelper::expose($object, $property);
-        }
-        if (!is_object($innerObject) || !$innerObject instanceof $type) {
+
+        if (!is_object($object) || !$object instanceof $type) {
             if (PHP_VERSION_ID >= 50400) {
                 $rc = new \ReflectionClass($type);
-                $innerObject = $rc->newInstanceWithoutConstructor();
+                $object = $rc->newInstanceWithoutConstructor();
             } else {
-                $innerObject = unserialize(sprintf('O:%d:"%s":0:{}', strlen($type), $type));
+                $object = unserialize(sprintf('O:%d:"%s":0:{}', strlen($type), $type));
             }
         }
-        return $this->normalizer->denormalize($value, $innerObject);
+        return $this->normalizer->denormalize($value, $object);
     }
 }

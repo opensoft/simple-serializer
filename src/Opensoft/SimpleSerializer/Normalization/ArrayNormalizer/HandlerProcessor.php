@@ -96,7 +96,10 @@ class HandlerProcessor
             $value = $arrayHandler->denormalizationHandle($value, $property, $object);
             unset($arrayHandler);
         } elseif (is_array($value)) {
-            $innerObjectHandler = new InnerObjectHandler($normalizer, $inner);
+            if (!$inner) {
+                $object = ObjectHelper::expose($object, $property);;
+            }
+            $innerObjectHandler = new InnerObjectHandler($normalizer);
             $value = $innerObjectHandler->denormalizationHandle($value, $property, $object);
             unset($innerObjectHandler);
         } elseif ($type !== null) {
