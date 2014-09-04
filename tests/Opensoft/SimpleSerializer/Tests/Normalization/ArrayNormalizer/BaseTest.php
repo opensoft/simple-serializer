@@ -79,6 +79,9 @@ class BaseTest extends \PHPUnit_Framework_TestCase
         return $simpleProperty;
     }
 
+    /**
+     * @return array
+     */
     public function childrenDataProvider()
     {
         $time = time();

@@ -44,6 +44,9 @@ class SimpleTypeTransformerTest extends BaseTest
         $this->assertSame($value, $denormalized);
     }
 
+    /**
+     * @return array
+     */
     public function provider()
     {
         return array(
@@ -65,6 +68,9 @@ class SimpleTypeTransformerTest extends BaseTest
         $this->assertFalse(SimpleTypeTransformer::supportType($badType));
     }
 
+    /**
+     * @return array
+     */
     public function typesProvider()
     {
         return array(

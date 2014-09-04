@@ -35,6 +35,9 @@ class ArrayNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     private $unitUnderTest;
 
+    /**
+     * @var MetadataFactory
+     */
     private $metadataFactory;
 
     public function testNormalization()

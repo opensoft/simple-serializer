@@ -96,6 +96,9 @@ class DateTimeTransformerTest extends \PHPUnit_Framework_TestCase
         $this->datetimeTransformer->denormalize($testDateTime->format(\DateTime::COOKIE), $property, new \stdClass());
     }
 
+    /**
+     * @return array
+     */
     public function dateTimeProvider()
     {
         return array(
