@@ -64,7 +64,7 @@ class ArrayTransformerTest extends BaseTest
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function setUp()
     {

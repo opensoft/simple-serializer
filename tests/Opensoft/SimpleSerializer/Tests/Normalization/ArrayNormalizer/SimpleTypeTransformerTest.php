@@ -22,26 +22,6 @@ class SimpleTypeTransformerTest extends BaseTest
      */
     private $transformer;
 
-    public function provider()
-    {
-        return array(
-            array('one', 'string'),
-            array(true, 'boolean'),
-            array(1, 'integer'),
-            array(20.05, 'double')
-        );
-    }
-
-    public function typesProvider()
-    {
-        return array(
-            array('string', 'badString'),
-            array('boolean', 'badBoolean'),
-            array('integer', 'badInteger'),
-            array('double', 'badDouble')
-        );
-    }
-
     /**
      * @dataProvider provider
      * @param string|bool|integer|double $value
@@ -64,6 +44,16 @@ class SimpleTypeTransformerTest extends BaseTest
         $this->assertSame($value, $denormalized);
     }
 
+    public function provider()
+    {
+        return array(
+            array('one', 'string'),
+            array(true, 'boolean'),
+            array(1, 'integer'),
+            array(20.05, 'double')
+        );
+    }
+
     /**
      * @dataProvider typesProvider
      * @param string $goodType
@@ -73,6 +63,16 @@ class SimpleTypeTransformerTest extends BaseTest
     {
         $this->assertTrue(SimpleTypeTransformer::isSimpleType($goodType));
         $this->assertFalse(SimpleTypeTransformer::isSimpleType($badType));
+    }
+
+    public function typesProvider()
+    {
+        return array(
+            array('string', 'badString'),
+            array('boolean', 'badBoolean'),
+            array('integer', 'badInteger'),
+            array('double', 'badDouble')
+        );
     }
 
     /**
@@ -91,7 +91,10 @@ class SimpleTypeTransformerTest extends BaseTest
         $this->transformer->denormalize(1.02, $this->makeSimpleProperty('', 'fantasticType'), new \stdClass());
     }
 
-    public function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
     {
         $this->transformer = new SimpleTypeTransformer();
     }

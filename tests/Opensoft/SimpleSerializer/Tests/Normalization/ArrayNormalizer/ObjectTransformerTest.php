@@ -10,7 +10,7 @@
 
 namespace Opensoft\SimpleSerializer\Tests\Normalization\ArrayNormalizer;
 
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\InnerObjectTransformer;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\ObjectTransformer;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
@@ -20,10 +20,10 @@ use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 /**
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-class InnerObjectTransformerTest extends BaseTest
+class ObjectTransformerTest extends BaseTest
 {
     /**
-     * @var InnerObjectTransformer
+     * @var ObjectTransformer
      */
     private $transformer;
 
@@ -58,11 +58,11 @@ class InnerObjectTransformerTest extends BaseTest
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function setUp()
     {
         $this->initializeNormalizer();
-        $this->transformer = new InnerObjectTransformer($this->normalizer);
+        $this->transformer = new ObjectTransformer($this->normalizer);
     }
 }

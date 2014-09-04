@@ -53,7 +53,7 @@ class ArrayNormalizer implements Normalizer
 
     /**
      * @param MetadataFactory $metadataFactory
-     * @param int $unserializeMode
+     * @param integer $unserializeMode
      */
     public function __construct(MetadataFactory $metadataFactory, PropertySkipper $propertySkipper, DataProcessor $dataProcessor, $unserializeMode = self::NON_STRICT_MODE)
     {

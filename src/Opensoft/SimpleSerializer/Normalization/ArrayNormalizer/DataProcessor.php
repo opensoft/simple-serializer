@@ -48,9 +48,9 @@ class DataProcessor
             $value = $arrayTransformer->normalize($value, $property);
             unset($arrayTransformer);
         } elseif (is_object($value)) {
-            $innerObjectTransformer = new InnerObjectTransformer($normalizer);
-            $value = $innerObjectTransformer->normalize($value, $property);
-            unset($innerObjectTransformer);
+            $objectTransformer = new ObjectTransformer($normalizer);
+            $value = $objectTransformer->normalize($value, $property);
+            unset($objectTransformer);
         } elseif ($type !== null) {
             throw new InvalidArgumentException(sprintf('Unsupported type: %s', $type));
         }
@@ -91,9 +91,9 @@ class DataProcessor
             if (!$inner) {
                 $object = ObjectHelper::expose($object, $property);;
             }
-            $innerObjectTransformer = new InnerObjectTransformer($normalizer);
-            $value = $innerObjectTransformer->denormalize($value, $property, $object);
-            unset($innerObjectTransformer);
+            $objectTransformer = new ObjectTransformer($normalizer);
+            $value = $objectTransformer->denormalize($value, $property, $object);
+            unset($objectTransformer);
         } elseif ($type !== null) {
             throw new InvalidArgumentException(sprintf('Unsupported type: %s', $type));
         }

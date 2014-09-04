@@ -10,8 +10,8 @@
 
 namespace Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 
-use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 use Opensoft\SimpleSerializer\Exception\InvalidArgumentException;
+use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 
 /**
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>

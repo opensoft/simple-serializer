@@ -10,14 +10,15 @@
 
 namespace Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
+
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-class InnerObjectTransformer implements Transformer
+class ObjectTransformer implements Transformer
 {
     /**
      * @var ArrayNormalizer
@@ -26,7 +27,6 @@ class InnerObjectTransformer implements Transformer
 
     /**
      * @param ArrayNormalizer $normalizer
-     * @param bool $inner
      */
     public function __construct(ArrayNormalizer $normalizer)
     {

@@ -11,10 +11,9 @@
 
 namespace Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 
-use DateTime;
 use Opensoft\SimpleSerializer\Exception\InvalidArgumentException;
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
@@ -23,13 +22,13 @@ use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 class DateTimeTransformer implements Transformer
 {
     /**
-     * @param DateTime $value
+     * @param \DateTime $value
      * @param PropertyMetadata $property
      * @return string
      */
     public function normalize($value, $property)
     {
-        $dateTimeFormat = $this->extractDateTimeFormat($property->getType(), DateTime::ISO8601);
+        $dateTimeFormat = $this->extractDateTimeFormat($property->getType(), \DateTime::ISO8601);
 
         return $value->format($dateTimeFormat);
     }
@@ -39,7 +38,7 @@ class DateTimeTransformer implements Transformer
      * @param string $value
      * @param PropertyMetadata $property
      * @param mixed $object
-     * @return DateTime
+     * @return \DateTime
      * @throws InvalidArgumentException
      */
     public function denormalize($value, $property, $object)
@@ -54,7 +53,7 @@ class DateTimeTransformer implements Transformer
 
         $dateTimeFormat = $this->extractDateTimeFormat($property->getType());
         try {
-            $value = new DateTime($value);
+            $value = new \DateTime($value);
         } catch (\Exception $e) {
             throw new InvalidArgumentException(sprintf('Invalid DateTime argument "%s"', $value), $e->getCode(), $e);
         }

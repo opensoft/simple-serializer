@@ -10,8 +10,8 @@
 
 namespace Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 
-use Opensoft\SimpleSerializer\Exception\RecursionException;
 use Opensoft\SimpleSerializer\Exception\InvalidArgumentException;
+use Opensoft\SimpleSerializer\Exception\RecursionException;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>

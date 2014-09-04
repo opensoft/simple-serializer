@@ -23,15 +23,6 @@ class DateTimeTransformerTest extends \PHPUnit_Framework_TestCase
      */
     private $datetimeTransformer;
 
-    public function dateTimeProvider()
-    {
-        return array(
-            array(
-                new \DateTime(date('Y-m-d H:i:s', time()))
-            )
-        );
-    }
-
     /**
      * @dataProvider dateTimeProvider
      * @param \DateTime $testDateTime
@@ -105,8 +96,17 @@ class DateTimeTransformerTest extends \PHPUnit_Framework_TestCase
         $this->datetimeTransformer->denormalize($testDateTime->format(\DateTime::COOKIE), $property, new \stdClass());
     }
 
+    public function dateTimeProvider()
+    {
+        return array(
+            array(
+                new \DateTime(date('Y-m-d H:i:s', time()))
+            )
+        );
+    }
+
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function setUp()
     {

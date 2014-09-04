@@ -95,9 +95,9 @@ class DataProcessorTest extends BaseTest
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->initializeNormalizer();
     }
