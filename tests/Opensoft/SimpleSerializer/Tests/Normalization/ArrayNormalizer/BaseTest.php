@@ -12,7 +12,7 @@ namespace Opensoft\SimpleSerializer\Tests\Normalization\ArrayNormalizer;
 
 use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\HandlerProcessor;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DataProcessor;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 use Opensoft\SimpleSerializer\Normalization\PropertySkipper;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
@@ -33,15 +33,15 @@ class BaseTest extends \PHPUnit_Framework_TestCase
     protected $normalizer;
 
     /**
-     * @var HandlerProcessor
+     * @var DataProcessor
      */
     protected $processor;
 
     /**
      * @param MetadataFactory $metadataFactory
-     * @param HandlerProcessor $processor
+     * @param DataProcessor $processor
      */
-    protected function initializeNormalizer(MetadataFactory $metadataFactory = null, HandlerProcessor $processor = null)
+    protected function initializeNormalizer(MetadataFactory $metadataFactory = null, DataProcessor $processor = null)
     {
         if (!$metadataFactory) {
             $locator = $this->getMockForAbstractClass(
@@ -61,7 +61,7 @@ class BaseTest extends \PHPUnit_Framework_TestCase
             $metadataFactory = new MetadataFactory($driver);
         }
 
-        $this->processor = $processor ? $processor : new HandlerProcessor();
+        $this->processor = $processor ? $processor : new DataProcessor();
         $this->metadataFactory = $metadataFactory;
         $this->normalizer = new ArrayNormalizer($this->metadataFactory, new PropertySkipper(), $this->processor);
     }

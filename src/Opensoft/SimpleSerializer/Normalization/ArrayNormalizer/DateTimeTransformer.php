@@ -20,14 +20,14 @@ use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-class DateTimeHandler implements Handler
+class DateTimeTransformer implements Transformer
 {
     /**
      * @param DateTime $value
      * @param PropertyMetadata $property
      * @return string
      */
-    public function normalizationHandle($value, $property)
+    public function normalize($value, $property)
     {
         $dateTimeFormat = $this->extractDateTimeFormat($property->getType(), DateTime::ISO8601);
 
@@ -42,7 +42,7 @@ class DateTimeHandler implements Handler
      * @return DateTime
      * @throws InvalidArgumentException
      */
-    public function denormalizationHandle($value, $property, $object)
+    public function denormalize($value, $property, $object)
     {
         // we should not allow empty string as date time argument.
         //It can lead us to unexpected results

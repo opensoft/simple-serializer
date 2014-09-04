@@ -17,7 +17,7 @@ use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-class InnerObjectHandler implements Handler
+class InnerObjectTransformer implements Transformer
 {
     /**
      * @var ArrayNormalizer
@@ -38,7 +38,7 @@ class InnerObjectHandler implements Handler
      * @param PropertyMetadata $property
      * @return mixed
      */
-    public function normalizationHandle($value, $property)
+    public function normalize($value, $property)
     {
         return $this->normalizer->normalize($value);
     }
@@ -49,7 +49,7 @@ class InnerObjectHandler implements Handler
      * @param object $object
      * @return object
      */
-    public function denormalizationHandle($value, $property, $object)
+    public function denormalize($value, $property, $object)
     {
         $type = $property->getType();
 

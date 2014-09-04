@@ -22,7 +22,7 @@ use Opensoft\SimpleSerializer\Normalization\PropertySkipper;
 use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
 use Opensoft\SimpleSerializer\Exclusion\GroupsSpecification;
 use Opensoft\SimpleSerializer\Exclusion\VersionSpecification;
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\HandlerProcessor;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DataProcessor;
 use DateTime;
 
 /**
@@ -654,6 +654,6 @@ class ArrayNormalizerTest extends \PHPUnit_Framework_TestCase
             array($locator)
         );
         $this->metadataFactory = new MetadataFactory($driver);
-        $this->unitUnderTest = $this->getMockForAbstractClass('\Opensoft\SimpleSerializer\Normalization\ArrayNormalizer', array($this->metadataFactory, new PropertySkipper(), new HandlerProcessor()));
+        $this->unitUnderTest = $this->getMockForAbstractClass('\Opensoft\SimpleSerializer\Normalization\ArrayNormalizer', array($this->metadataFactory, new PropertySkipper(), new DataProcessor()));
     }
 }

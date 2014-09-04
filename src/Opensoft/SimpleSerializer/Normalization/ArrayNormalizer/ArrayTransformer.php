@@ -18,10 +18,10 @@ use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-class ArrayHandler implements Handler
+class ArrayTransformer implements Transformer
 {
     /**
-     * @var HandlerProcessor
+     * @var DataProcessor
      */
     private $processor;
 
@@ -32,9 +32,9 @@ class ArrayHandler implements Handler
 
     /**
      * @param ArrayNormalizer $normalizer
-     * @param HandlerProcessor $processor
+     * @param DataProcessor $processor
      */
-    public function __construct(ArrayNormalizer $normalizer, HandlerProcessor $processor)
+    public function __construct(ArrayNormalizer $normalizer, DataProcessor $processor)
     {
         $this->normalizer = $normalizer;
         $this->processor = $processor;
@@ -46,7 +46,7 @@ class ArrayHandler implements Handler
      *
      * @return array|bool|float|int|string|null
      */
-    public function normalizationHandle($value, $property)
+    public function normalize($value, $property)
     {
         $result = array();
         $itemProperty = $this->makeItemProperty($property);
@@ -63,7 +63,7 @@ class ArrayHandler implements Handler
      * @param PropertyMetadata $property
      * @param $object
      */
-    public function denormalizationHandle($value, $property, $object)
+    public function denormalize($value, $property, $object)
     {
         $result = array();
         $itemProperty = $this->makeItemProperty($property);

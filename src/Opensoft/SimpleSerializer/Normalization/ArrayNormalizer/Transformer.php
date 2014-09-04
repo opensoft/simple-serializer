@@ -15,14 +15,14 @@ use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 /**
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-interface Handler
+interface Transformer
 {
     /**
      * @param mixed $value
      * @param PropertyMetadata $property
      * @return mixed
      */
-    function normalizationHandle($value, $property);
+    function normalize($value, $property);
 
     /**
      * @param mixed $value
@@ -30,5 +30,5 @@ interface Handler
      * @param mixed $object
      * @return mixed
      */
-    function denormalizationHandle($value, $property, $object);
+    function denormalize($value, $property, $object);
 } 

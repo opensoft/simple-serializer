@@ -11,7 +11,7 @@
 namespace Opensoft\SimpleSerializer\Tests\Normalization\ArrayNormalizer;
 
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\ArrayHandler;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\ArrayTransformer;
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\ObjectHelper;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E;
@@ -19,19 +19,19 @@ use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E;
 /**
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-class ArrayHandlerTest extends BaseTest
+class ArrayTransformerTest extends BaseTest
 {
     /**
-     * @var ArrayHandler
+     * @var ArrayTransformer
      */
-    private $arrayHandler;
+    private $arrayTransformer;
 
     /**
      * @dataProvider childrenDataProvider
      * @param AChildren $aChildren
      * @param array $aChildrenAsArray
      */
-    public function testNormalization($aChildren, $aChildrenAsArray)
+    public function testNormalize($aChildren, $aChildrenAsArray)
     {
         $object = new E();
         $object->setRid(3);
@@ -43,7 +43,7 @@ class ArrayHandlerTest extends BaseTest
         $properties = $metadata->getProperties();
         $arrayOfObjectsProperty = $properties['arrayOfObjects'];
         $data = ObjectHelper::expose($object, $arrayOfObjectsProperty);
-        $normalizedArray = $this->arrayHandler->normalizationHandle($data, $arrayOfObjectsProperty);
+        $normalizedArray = $this->arrayTransformer->normalize($data, $arrayOfObjectsProperty);
 
         $this->assertEquals(array($aChildrenAsArray), $normalizedArray);
     }
@@ -53,13 +53,13 @@ class ArrayHandlerTest extends BaseTest
      * @param AChildren $aChildren
      * @param array $aChildrenAsArray
      */
-    public function testDenormalization($aChildren, $aChildrenAsArray)
+    public function testDenormalize($aChildren, $aChildrenAsArray)
     {
         $object = new E();
         $className = ObjectHelper::getFullClassName($object);
         $metadata = $this->metadataFactory->getMetadataForClass($className);
         $properties = $metadata->getProperties();
-        $denormalizedObject = $this->arrayHandler->denormalizationHandle(array($aChildrenAsArray), $properties['arrayOfObjects'], $object);
+        $denormalizedObject = $this->arrayTransformer->denormalize(array($aChildrenAsArray), $properties['arrayOfObjects'], $object);
         $this->assertEquals(array($aChildren), $denormalizedObject);
     }
 
@@ -69,6 +69,6 @@ class ArrayHandlerTest extends BaseTest
     protected function setUp()
     {
         $this->initializeNormalizer();
-        $this->arrayHandler = new ArrayHandler($this->normalizer, $this->processor);
+        $this->arrayTransformer = new ArrayTransformer($this->normalizer, $this->processor);
     }
 }

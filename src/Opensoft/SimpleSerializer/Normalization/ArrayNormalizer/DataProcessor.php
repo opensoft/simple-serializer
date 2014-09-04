@@ -18,7 +18,7 @@ use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-class HandlerProcessor
+class DataProcessor
 {
     /**
      * @param ArrayNormalizer $normalizer
@@ -35,26 +35,22 @@ class HandlerProcessor
 
         $type = $property->getType();
 
-        if ($type === 'string') {
-            $value = (string)$value;
-        } elseif ($type === 'boolean') {
-            $value = (boolean)$value;
-        } elseif ($type === 'integer') {
-            $value = (integer)$value;
-        } elseif ($type === 'double') {
-            $value = (double)$value;
+        if (SimpleTypeTransformer::isSimpleType($type)) {
+            $simpleTypeTransformer = new SimpleTypeTransformer();
+            $value = $simpleTypeTransformer->normalize($value, $property);
+            unset($simpleTypeTransformer);
         } elseif ($type === 'DateTime' || ($type[0] === 'D' && strpos($type, 'DateTime<') === 0)) {
-            $dateHandler = new DateTimeHandler();
-            $value= $dateHandler->normalizationHandle($value, $property);
-            unset($dateHandler);
+            $dateTimeTransformer = new DateTimeTransformer();
+            $value= $dateTimeTransformer->normalize($value, $property);
+            unset($dateTimeTransformer);
         } elseif ($type === 'array' || ($type[0] === 'a' && strpos($type, 'array<') === 0)) {
-            $arrayHandler = new ArrayHandler($normalizer, $this);
-            $value = $arrayHandler->normalizationHandle($value, $property);
-            unset($arrayHandler);
+            $arrayTransformer = new ArrayTransformer($normalizer, $this);
+            $value = $arrayTransformer->normalize($value, $property);
+            unset($arrayTransformer);
         } elseif (is_object($value)) {
-            $innerObjectHandler = new InnerObjectHandler($normalizer);
-            $value = $innerObjectHandler->normalizationHandle($value, $property);
-            unset($innerObjectHandler);
+            $innerObjectTransformer = new InnerObjectTransformer($normalizer);
+            $value = $innerObjectTransformer->normalize($value, $property);
+            unset($innerObjectTransformer);
         } elseif ($type !== null) {
             throw new InvalidArgumentException(sprintf('Unsupported type: %s', $type));
         }
@@ -79,29 +75,25 @@ class HandlerProcessor
 
         $type = $property->getType();
 
-        if ($type === 'string') {
-            $value = (string)$value;
-        } elseif ($type === 'boolean') {
-            $value = (boolean)$value;
-        } elseif ($type === 'integer') {
-            $value = (integer)$value;
-        } elseif ($type === 'double') {
-            $value = (double)$value;
+        if (SimpleTypeTransformer::isSimpleType($type)) {
+            $simpleTypeTransformer = new SimpleTypeTransformer();
+            $value = $simpleTypeTransformer->denormalize($value, $property, $object);
+            unset($simpleTypeTransformer);
         } elseif ($type === 'DateTime' || ($type[0] === 'D' && strpos($type, 'DateTime<') === 0)) {
-            $dateHandler = new DateTimeHandler();
-            $value = $dateHandler->denormalizationHandle($value, $property, $object);
-            unset($dateHandler);
+            $dateTimeTransformer = new DateTimeTransformer();
+            $value = $dateTimeTransformer->denormalize($value, $property, $object);
+            unset($dateTimeTransformer);
         } elseif ($type === 'array' || ($type[0] === 'a' && strpos($type, 'array<') === 0)) {
-            $arrayHandler = new ArrayHandler($normalizer, $this);
-            $value = $arrayHandler->denormalizationHandle($value, $property, $object);
-            unset($arrayHandler);
+            $arrayTransformer = new ArrayTransformer($normalizer, $this);
+            $value = $arrayTransformer->denormalize($value, $property, $object);
+            unset($arrayTransformer);
         } elseif (is_array($value)) {
             if (!$inner) {
                 $object = ObjectHelper::expose($object, $property);;
             }
-            $innerObjectHandler = new InnerObjectHandler($normalizer);
-            $value = $innerObjectHandler->denormalizationHandle($value, $property, $object);
-            unset($innerObjectHandler);
+            $innerObjectTransformer = new InnerObjectTransformer($normalizer);
+            $value = $innerObjectTransformer->denormalize($value, $property, $object);
+            unset($innerObjectTransformer);
         } elseif ($type !== null) {
             throw new InvalidArgumentException(sprintf('Unsupported type: %s', $type));
         }

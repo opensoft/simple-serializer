@@ -17,8 +17,8 @@ use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 use Opensoft\SimpleSerializer\Exclusion\Specification;
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\ObjectHelper;
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DateTimeHandler;
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\HandlerProcessor;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DateTimeTransformer;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DataProcessor;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
@@ -42,9 +42,9 @@ class ArrayNormalizer implements Normalizer
     private $propertySkipper;
 
     /**
-     * @var HandlerProcessor
+     * @var DataProcessor
      */
-    private $valueHandleProcessor;
+    private $dataProcessor;
 
     /**
      * @var integer
@@ -55,11 +55,11 @@ class ArrayNormalizer implements Normalizer
      * @param MetadataFactory $metadataFactory
      * @param int $unserializeMode
      */
-    public function __construct(MetadataFactory $metadataFactory, PropertySkipper $propertySkipper, HandlerProcessor $handlerProcessor, $unserializeMode = self::NON_STRICT_MODE)
+    public function __construct(MetadataFactory $metadataFactory, PropertySkipper $propertySkipper, DataProcessor $dataProcessor, $unserializeMode = self::NON_STRICT_MODE)
     {
         $this->metadataFactory = $metadataFactory;
         $this->propertySkipper = $propertySkipper;
-        $this->valueHandleProcessor = $handlerProcessor;
+        $this->dataProcessor = $dataProcessor;
         $this->setUnserializeMode($unserializeMode);
     }
 
@@ -81,7 +81,7 @@ class ArrayNormalizer implements Normalizer
 
             $value = ObjectHelper::expose($object, $property);
 
-            $value = $this->valueHandleProcessor->normalizeProcess($this, $value, $property);
+            $value = $this->dataProcessor->normalizeProcess($this, $value, $property);
             $result[$property->getSerializedName()] = $value;
         }
 
@@ -115,7 +115,7 @@ class ArrayNormalizer implements Normalizer
                 }
                 continue;
             }
-            $value = $this->valueHandleProcessor->denormalizeProcess($this, $data[$property->getSerializedName()], $property, $object);
+            $value = $this->dataProcessor->denormalizeProcess($this, $data[$property->getSerializedName()], $property, $object);
             ObjectHelper::involve($object, $property, $value);
             $unserializedProperties ++;
         }

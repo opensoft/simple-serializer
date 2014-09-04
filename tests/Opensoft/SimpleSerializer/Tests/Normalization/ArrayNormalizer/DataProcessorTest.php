@@ -16,7 +16,7 @@ use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
 /**
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-class HandlerProcessorTest extends BaseTest
+class DataProcessorTest extends BaseTest
 {
     /**
      * @dataProvider childrenDataProvider

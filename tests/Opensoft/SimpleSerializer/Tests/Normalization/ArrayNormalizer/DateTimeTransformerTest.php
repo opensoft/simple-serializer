@@ -11,17 +11,17 @@
 namespace Opensoft\SimpleSerializer\Tests\Normalization\ArrayNormalizer;
 
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DateTimeHandler;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DateTimeTransformer;
 
 /**
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-class DateTimeHandlerTest extends \PHPUnit_Framework_TestCase
+class DateTimeTransformerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var DateTimeHandler
+     * @var DateTimeTransformer
      */
-    private $datetimeHandler;
+    private $datetimeTransformer;
 
     public function dateTimeProvider()
     {
@@ -36,18 +36,18 @@ class DateTimeHandlerTest extends \PHPUnit_Framework_TestCase
      * @dataProvider dateTimeProvider
      * @param \DateTime $testDateTime
      */
-    public function testNormalization($testDateTime)
+    public function testNormalize($testDateTime)
     {
         $property = new PropertyMetadata('dateTime');
-        $normalizedDateTime = $this->datetimeHandler->normalizationHandle($testDateTime, $property);
+        $normalizedDateTime = $this->datetimeTransformer->normalize($testDateTime, $property);
         $this->assertEquals($testDateTime->format(\DateTime::ISO8601), $normalizedDateTime);
 
         $property->setType('DateTime<COOKIE>');
-        $normalizedDateTime = $this->datetimeHandler->normalizationHandle($testDateTime, $property);
+        $normalizedDateTime = $this->datetimeTransformer->normalize($testDateTime, $property);
         $this->assertEquals($testDateTime->format(\DateTime::COOKIE), $normalizedDateTime);
 
         $property->setType('DateTime<Y-m-d>');
-        $normalizedDateTime = $this->datetimeHandler->normalizationHandle($testDateTime, $property);
+        $normalizedDateTime = $this->datetimeTransformer->normalize($testDateTime, $property);
         $this->assertEquals($testDateTime->format('Y-m-d'), $normalizedDateTime);
     }
 
@@ -55,23 +55,23 @@ class DateTimeHandlerTest extends \PHPUnit_Framework_TestCase
      * @dataProvider dateTimeProvider
      * @param \DateTime $testDateTime
      */
-    public function testDenormalization($testDateTime)
+    public function testDenormalize($testDateTime)
     {
         $normalized = $testDateTime->format(\DateTime::COOKIE);
         $property = new PropertyMetadata('dateTime');
         $property->setType('DateTime<COOKIE>');
 
-        $denormalized = $this->datetimeHandler->denormalizationHandle($normalized, $property, new \stdClass());
+        $denormalized = $this->datetimeTransformer->denormalize($normalized, $property, new \stdClass());
         $this->assertEquals(new \DateTime($normalized), $denormalized);
 
         $property->setType('DateTime');
         $normalized = $testDateTime->format(\DateTime::ISO8601);
-        $denormalized = $this->datetimeHandler->denormalizationHandle($normalized, $property, new \stdClass());
+        $denormalized = $this->datetimeTransformer->denormalize($normalized, $property, new \stdClass());
         $this->assertEquals(new \DateTime($normalized), $denormalized);
 
         $property->setType('DateTime<Y-m-d>');
         $normalized = '    ' . $testDateTime->format('Y-m-d');
-        $denormalized = $this->datetimeHandler->denormalizationHandle($normalized, $property, new \stdClass());
+        $denormalized = $this->datetimeTransformer->denormalize($normalized, $property, new \stdClass());
         $this->assertEquals(new \DateTime($normalized), $denormalized);
     }
 
@@ -81,7 +81,7 @@ class DateTimeHandlerTest extends \PHPUnit_Framework_TestCase
     public function testDenormalizationExceptionEmptyValue()
     {
         $property = new PropertyMetadata('dateTime');
-        $this->datetimeHandler->denormalizationHandle('  ', $property, new \stdClass());
+        $this->datetimeTransformer->denormalize('  ', $property, new \stdClass());
     }
 
     /**
@@ -90,7 +90,7 @@ class DateTimeHandlerTest extends \PHPUnit_Framework_TestCase
     public function testDenormalizationExceptionWrongValue()
     {
         $property = new PropertyMetadata('dateTime');
-        $this->datetimeHandler->denormalizationHandle('argentina-jamaica50', $property, new \stdClass());
+        $this->datetimeTransformer->denormalize('argentina-jamaica50', $property, new \stdClass());
     }
 
     /**
@@ -102,7 +102,7 @@ class DateTimeHandlerTest extends \PHPUnit_Framework_TestCase
         $property = new PropertyMetadata('dateTime');
         $property->setType('DateTime<Y-m-d H:i>');
 
-        $this->datetimeHandler->denormalizationHandle($testDateTime->format(\DateTime::COOKIE), $property, new \stdClass());
+        $this->datetimeTransformer->denormalize($testDateTime->format(\DateTime::COOKIE), $property, new \stdClass());
     }
 
     /**
@@ -110,6 +110,6 @@ class DateTimeHandlerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->datetimeHandler = new DateTimeHandler();
+        $this->datetimeTransformer = new DateTimeTransformer();
     }
 }

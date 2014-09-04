@@ -10,7 +10,7 @@
 
 namespace Opensoft\SimpleSerializer\Tests\Normalization\ArrayNormalizer;
 
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\InnerObjectHandler;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\InnerObjectTransformer;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
@@ -20,12 +20,12 @@ use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 /**
  * @author Anton Konovalov <anton.konovalov@opensoftdev.ru>
  */
-class InnerObjectHandlerTest extends BaseTest
+class InnerObjectTransformerTest extends BaseTest
 {
     /**
-     * @var InnerObjectHandler
+     * @var InnerObjectTransformer
      */
-    private $handler;
+    private $transformer;
 
     /**
      * @dataProvider childrenDataProvider
@@ -34,7 +34,7 @@ class InnerObjectHandlerTest extends BaseTest
      */
     public function testNormalization($aChildren, $aChildrenAsArray)
     {
-        $normalizedChildren = $this->handler->normalizationHandle($aChildren, new PropertyMetadata('children'));
+        $normalizedChildren = $this->transformer->normalize($aChildren, new PropertyMetadata('children'));
         $this->assertEquals($aChildrenAsArray, $normalizedChildren);
     }
 
@@ -47,13 +47,13 @@ class InnerObjectHandlerTest extends BaseTest
     {
         $object = new AChildren();
         $property = $this->makeSimpleProperty('children', 'Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren');
-        $this->handler->denormalizationHandle($aChildrenAsArray, $property, $object);
+        $this->transformer->denormalize($aChildrenAsArray, $property, $object);
         $this->assertEquals($aChildren, $object);
 
-        $object = $this->handler->denormalizationHandle($aChildrenAsArray, $property, 1);
+        $object = $this->transformer->denormalize($aChildrenAsArray, $property, 1);
         $this->assertEquals($aChildren, $object);
 
-        $object = $this->handler->denormalizationHandle($aChildrenAsArray, $property, new A(), true);
+        $object = $this->transformer->denormalize($aChildrenAsArray, $property, new A(), true);
         $this->assertEquals($aChildren, $object);
     }
 
@@ -63,6 +63,6 @@ class InnerObjectHandlerTest extends BaseTest
     protected function setUp()
     {
         $this->initializeNormalizer();
-        $this->handler = new InnerObjectHandler($this->normalizer);
+        $this->transformer = new InnerObjectTransformer($this->normalizer);
     }
 }
