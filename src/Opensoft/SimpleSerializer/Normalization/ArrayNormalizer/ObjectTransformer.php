@@ -10,9 +10,8 @@
 
 namespace Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 
-
-use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
+use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>

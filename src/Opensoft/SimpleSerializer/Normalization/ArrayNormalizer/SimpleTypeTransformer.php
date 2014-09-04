@@ -68,7 +68,7 @@ class SimpleTypeTransformer implements Transformer
     /**
      * @param string $type
      */
-    public static function isSimpleType($type)
+    public static function supportType($type)
     {
         return in_array(
             $type,

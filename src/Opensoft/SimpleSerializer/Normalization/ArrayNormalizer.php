@@ -12,13 +12,10 @@
 namespace Opensoft\SimpleSerializer\Normalization;
 
 use Opensoft\SimpleSerializer\Exception\InvalidArgumentException;
-use Opensoft\SimpleSerializer\Exception\RecursionException;
-use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
-use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 use Opensoft\SimpleSerializer\Exclusion\Specification;
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\ObjectHelper;
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DateTimeTransformer;
+use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DataProcessor;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\ObjectHelper;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
@@ -53,6 +50,8 @@ class ArrayNormalizer implements Normalizer
 
     /**
      * @param MetadataFactory $metadataFactory
+     * @param PropertySkipper $propertySkipper
+     * @param DataProcessor $dataProcessor
      * @param integer $unserializeMode
      */
     public function __construct(MetadataFactory $metadataFactory, PropertySkipper $propertySkipper, DataProcessor $dataProcessor, $unserializeMode = self::NON_STRICT_MODE)

@@ -59,9 +59,10 @@ class ArrayTransformer implements Transformer
     }
 
     /**
-     * @param mixed $value
+     * @param array $value
      * @param PropertyMetadata $property
-     * @param $object
+     * @param mixed $object
+     * @return array
      */
     public function denormalize($value, $property, $object)
     {

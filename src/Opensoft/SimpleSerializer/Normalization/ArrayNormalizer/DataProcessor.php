@@ -10,9 +10,10 @@
 
 namespace Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
+
 use Opensoft\SimpleSerializer\Exception\InvalidArgumentException;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
@@ -35,7 +36,7 @@ class DataProcessor
 
         $type = $property->getType();
 
-        if (SimpleTypeTransformer::isSimpleType($type)) {
+        if (SimpleTypeTransformer::supportType($type)) {
             $simpleTypeTransformer = new SimpleTypeTransformer();
             $value = $simpleTypeTransformer->normalize($value, $property);
             unset($simpleTypeTransformer);
@@ -75,7 +76,7 @@ class DataProcessor
 
         $type = $property->getType();
 
-        if (SimpleTypeTransformer::isSimpleType($type)) {
+        if (SimpleTypeTransformer::supportType($type)) {
             $simpleTypeTransformer = new SimpleTypeTransformer();
             $value = $simpleTypeTransformer->denormalize($value, $property, $object);
             unset($simpleTypeTransformer);

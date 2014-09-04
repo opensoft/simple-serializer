@@ -59,10 +59,10 @@ class SimpleTypeTransformerTest extends BaseTest
      * @param string $goodType
      * @param string $badType
      */
-    public function testIsSimpleType($goodType, $badType)
+    public function testSupportType($goodType, $badType)
     {
-        $this->assertTrue(SimpleTypeTransformer::isSimpleType($goodType));
-        $this->assertFalse(SimpleTypeTransformer::isSimpleType($badType));
+        $this->assertTrue(SimpleTypeTransformer::supportType($goodType));
+        $this->assertFalse(SimpleTypeTransformer::supportType($badType));
     }
 
     public function typesProvider()
