@@ -23,30 +23,41 @@ class DateTimeHandlerTest extends \PHPUnit_Framework_TestCase
      */
     private $datetimeHandler;
 
-    public function testNormalization()
+    public function dateTimeProvider()
     {
-        $time = time();
-        $testTime = new \DateTime(date('Y-m-d H:i:s', $time));
-
-        $property = new PropertyMetadata('dateTime');
-        $normalizedDateTime = $this->datetimeHandler->normalizationHandle($testTime, $property);
-        $this->assertEquals($testTime->format(\DateTime::ISO8601), $normalizedDateTime);
-
-        $property->setType('DateTime<COOKIE>');
-        $normalizedDateTime = $this->datetimeHandler->normalizationHandle($testTime, $property);
-        $this->assertEquals($testTime->format(\DateTime::COOKIE), $normalizedDateTime);
-
-        $property->setType('DateTime<Y-m-d>');
-        $normalizedDateTime = $this->datetimeHandler->normalizationHandle($testTime, $property);
-        $this->assertEquals($testTime->format('Y-m-d'), $normalizedDateTime);
+        return array(
+            array(
+                new \DateTime(date('Y-m-d H:i:s', time()))
+            )
+        );
     }
 
-    public function testDenormalization()
+    /**
+     * @dataProvider dateTimeProvider
+     * @param \DateTime $testDateTime
+     */
+    public function testNormalization($testDateTime)
     {
-        $time = time();
-        $testTime = new \DateTime(date('Y-m-d H:i:s', $time));
+        $property = new PropertyMetadata('dateTime');
+        $normalizedDateTime = $this->datetimeHandler->normalizationHandle($testDateTime, $property);
+        $this->assertEquals($testDateTime->format(\DateTime::ISO8601), $normalizedDateTime);
 
-        $normalized = $testTime->format(\DateTime::COOKIE);
+        $property->setType('DateTime<COOKIE>');
+        $normalizedDateTime = $this->datetimeHandler->normalizationHandle($testDateTime, $property);
+        $this->assertEquals($testDateTime->format(\DateTime::COOKIE), $normalizedDateTime);
+
+        $property->setType('DateTime<Y-m-d>');
+        $normalizedDateTime = $this->datetimeHandler->normalizationHandle($testDateTime, $property);
+        $this->assertEquals($testDateTime->format('Y-m-d'), $normalizedDateTime);
+    }
+
+    /**
+     * @dataProvider dateTimeProvider
+     * @param \DateTime $testDateTime
+     */
+    public function testDenormalization($testDateTime)
+    {
+        $normalized = $testDateTime->format(\DateTime::COOKIE);
         $property = new PropertyMetadata('dateTime');
         $property->setType('DateTime<COOKIE>');
 
@@ -54,12 +65,12 @@ class DateTimeHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new \DateTime($normalized), $denormalized);
 
         $property->setType('DateTime');
-        $normalized = $testTime->format(\DateTime::ISO8601);
+        $normalized = $testDateTime->format(\DateTime::ISO8601);
         $denormalized = $this->datetimeHandler->denormalizationHandle($normalized, $property, new \stdClass());
         $this->assertEquals(new \DateTime($normalized), $denormalized);
 
         $property->setType('DateTime<Y-m-d>');
-        $normalized = '    ' . $testTime->format('Y-m-d');
+        $normalized = '    ' . $testDateTime->format('Y-m-d');
         $denormalized = $this->datetimeHandler->denormalizationHandle($normalized, $property, new \stdClass());
         $this->assertEquals(new \DateTime($normalized), $denormalized);
     }
@@ -83,17 +94,15 @@ class DateTimeHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider dateTimeProvider
      * @expectedException \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
      */
-    public function testDenormalizationExceptionWrongFormat()
+    public function testDenormalizationExceptionWrongFormat($testDateTime)
     {
-        $time = time();
-        $testTime = new \DateTime(date('Y-m-d H:i:s', $time));
-
         $property = new PropertyMetadata('dateTime');
         $property->setType('DateTime<Y-m-d H:i>');
 
-        $this->datetimeHandler->denormalizationHandle($testTime->format(\DateTime::COOKIE), $property, new \stdClass());
+        $this->datetimeHandler->denormalizationHandle($testDateTime->format(\DateTime::COOKIE), $property, new \stdClass());
     }
 
     /**
