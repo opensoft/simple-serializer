@@ -25,7 +25,10 @@ class SimpleTypeTransformerTest extends BaseTest
     public function provider()
     {
         return array(
-            array('one', true, 1, 20.05)
+            array('one', 'string'),
+            array(true, 'boolean'),
+            array(1, 'integer'),
+            array(20.05, 'double')
         );
     }
 
@@ -41,46 +44,24 @@ class SimpleTypeTransformerTest extends BaseTest
 
     /**
      * @dataProvider provider
-     * @param $string
-     * @param $boolean
-     * @param $integer
-     * @param $double
+     * @param string|bool|integer|double $value
+     * @param string $simpleType
      */
-    public function testNormalize($string, $boolean, $integer, $double)
+    public function testNormalize($value, $simpleType)
     {
-        $value = $this->transformer->normalize($string, $this->makeSimpleProperty('string', 'string'));
-        $this->assertSame($string, $value);
-
-        $value = $this->transformer->normalize($boolean, $this->makeSimpleProperty('boolean', 'boolean'));
-        $this->assertSame($boolean, $value);
-
-        $value = $this->transformer->normalize($integer, $this->makeSimpleProperty('integer', 'integer'));
-        $this->assertSame($integer, $value);
-
-        $value = $this->transformer->normalize($double, $this->makeSimpleProperty('double', 'double'));
-        $this->assertSame($double, $value);
+        $normalizedValue = $this->transformer->normalize($value, $this->makeSimpleProperty($simpleType, $simpleType));
+        $this->assertSame($value, $normalizedValue);
     }
 
     /**
      * @dataProvider provider
-     * @param $string
-     * @param $boolean
-     * @param $integer
-     * @param $double
+     * @param string|bool|integer|double $value
+     * @param string $simpleType
      */
-    public function testDenormalize($string, $boolean, $integer, $double)
+    public function testDenormalize($value, $simpleType)
     {
-        $value = $this->transformer->denormalize($string, $this->makeSimpleProperty('string', 'string'),  new \stdClass());
-        $this->assertSame($string, $value);
-
-        $value = $this->transformer->denormalize($boolean, $this->makeSimpleProperty('boolean', 'boolean'),  new \stdClass());
-        $this->assertSame($boolean, $value);
-
-        $value = $this->transformer->denormalize($integer, $this->makeSimpleProperty('integer', 'integer'),  new \stdClass());
-        $this->assertSame($integer, $value);
-
-        $value = $this->transformer->denormalize($double, $this->makeSimpleProperty('double', 'double'),  new \stdClass());
-        $this->assertSame($double, $value);
+        $denormalized = $this->transformer->denormalize($value, $this->makeSimpleProperty($simpleType, $simpleType),  new \stdClass());
+        $this->assertSame($value, $denormalized);
     }
 
     /**
