@@ -22,6 +22,19 @@ use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 class DataProcessor
 {
     /**
+     * @var TransformerFactory
+     */
+    private $transformerFactory;
+
+    /**
+     * @param TransformerFactory $factory
+     */
+    public function __construct(TransformerFactory $factory)
+    {
+        $this->transformerFactory = $factory;
+    }
+
+    /**
      * @param ArrayNormalizer $normalizer
      * @param mixed $value
      * @param PropertyMetadata $property
@@ -34,26 +47,26 @@ class DataProcessor
             return null;
         }
 
-        $type = $property->getType();
+        $transformerAliases = array(
+            TransformerFactory::TYPE_SIMPLE_TRANSFORMER,
+            TransformerFactory::TYPE_DATETIME_TRANSFORMER,
+            TransformerFactory::TYPE_ARRAY_TRANSFORMER,
+            TransformerFactory::TYPE_OBJECT_TRANSFORMER
+        );
 
-        if (SimpleTypeTransformer::supportType($type)) {
-            $simpleTypeTransformer = new SimpleTypeTransformer();
-            $value = $simpleTypeTransformer->normalize($value, $property);
-            unset($simpleTypeTransformer);
-        } elseif ($type === 'DateTime' || ($type[0] === 'D' && strpos($type, 'DateTime<') === 0)) {
-            $dateTimeTransformer = new DateTimeTransformer();
-            $value= $dateTimeTransformer->normalize($value, $property);
-            unset($dateTimeTransformer);
-        } elseif ($type === 'array' || ($type[0] === 'a' && strpos($type, 'array<') === 0)) {
-            $arrayTransformer = new ArrayTransformer($normalizer, $this);
-            $value = $arrayTransformer->normalize($value, $property);
-            unset($arrayTransformer);
-        } elseif (is_object($value)) {
-            $objectTransformer = new ObjectTransformer($normalizer);
-            $value = $objectTransformer->normalize($value, $property);
-            unset($objectTransformer);
-        } elseif ($type !== null) {
-            throw new InvalidArgumentException(sprintf('Unsupported type: %s', $type));
+        $supports = false;
+        foreach($transformerAliases as $transformerAlias)
+        {
+            $transformer = $this->transformerFactory->getTransformer($transformerAlias, $normalizer, $this);
+            if ($transformer->supportType($property->getType()) && $transformer->supportValueForNormalization($value)) {
+                $value = $transformer->normalize($value, $property);
+                $supports = true;
+                break;
+            }
+        }
+
+        if (!$supports && $property->getType() !== null) {
+            throw new InvalidArgumentException(sprintf('Unsupported type: %s', $property->getType()));
         }
 
         return $value;
@@ -74,29 +87,29 @@ class DataProcessor
             return null;
         }
 
-        $type = $property->getType();
+        $transformerAliases = array(
+            TransformerFactory::TYPE_SIMPLE_TRANSFORMER,
+            TransformerFactory::TYPE_DATETIME_TRANSFORMER,
+            TransformerFactory::TYPE_ARRAY_TRANSFORMER,
+            TransformerFactory::TYPE_OBJECT_TRANSFORMER
+        );
 
-        if (SimpleTypeTransformer::supportType($type)) {
-            $simpleTypeTransformer = new SimpleTypeTransformer();
-            $value = $simpleTypeTransformer->denormalize($value, $property, $object);
-            unset($simpleTypeTransformer);
-        } elseif ($type === 'DateTime' || ($type[0] === 'D' && strpos($type, 'DateTime<') === 0)) {
-            $dateTimeTransformer = new DateTimeTransformer();
-            $value = $dateTimeTransformer->denormalize($value, $property, $object);
-            unset($dateTimeTransformer);
-        } elseif ($type === 'array' || ($type[0] === 'a' && strpos($type, 'array<') === 0)) {
-            $arrayTransformer = new ArrayTransformer($normalizer, $this);
-            $value = $arrayTransformer->denormalize($value, $property, $object);
-            unset($arrayTransformer);
-        } elseif (is_array($value)) {
-            if (!$inner) {
-                $object = ObjectHelper::expose($object, $property);;
+        $supports = false;
+        foreach($transformerAliases as $transformerAlias)
+        {
+            $transformer = $this->transformerFactory->getTransformer($transformerAlias, $normalizer, $this);
+            if ($transformer->supportType($property->getType()) && $transformer->supportValueForDenormalization($value)) {
+                if ($transformerAlias === TransformerFactory::TYPE_OBJECT_TRANSFORMER && !$inner) {
+                    $object = ObjectHelper::expose($object, $property);
+                }
+                $value = $transformer->denormalize($value, $property, $object);
+                $supports = true;
+                break;
             }
-            $objectTransformer = new ObjectTransformer($normalizer);
-            $value = $objectTransformer->denormalize($value, $property, $object);
-            unset($objectTransformer);
-        } elseif ($type !== null) {
-            throw new InvalidArgumentException(sprintf('Unsupported type: %s', $type));
+        }
+
+        if (!$supports && $property->getType() !== null) {
+            throw new InvalidArgumentException(sprintf('Unsupported type: %s', $property->getType()));
         }
 
         return $value;

@@ -10,8 +10,8 @@
 
 namespace Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
@@ -61,5 +61,32 @@ class ObjectTransformer implements Transformer
             }
         }
         return $this->normalizer->denormalize($value, $object);
+    }
+
+    /**
+     * @param $type
+     * @return bool
+     */
+    public function supportType($type)
+    {
+        return true;
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public function supportValueForNormalization($value)
+    {
+        return is_object($value);
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public function supportValueForDenormalization($value)
+    {
+        return is_array($value);
     }
 }

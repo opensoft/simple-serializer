@@ -11,19 +11,20 @@
 
 namespace Opensoft\SimpleSerializer\Tests\Normalization;
 
+use DateTime;
+use Opensoft\SimpleSerializer\Exclusion\GroupsSpecification;
+use Opensoft\SimpleSerializer\Exclusion\VersionSpecification;
+use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DataProcessor;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\TransformerFactory;
+use Opensoft\SimpleSerializer\Normalization\Normalizer;
+use Opensoft\SimpleSerializer\Normalization\PropertySkipper;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\D;
+use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\DateTime as TestDateTime;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\Recursion;
-use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\DateTime as TestDateTime;
-use Opensoft\SimpleSerializer\Normalization\Normalizer;
-use Opensoft\SimpleSerializer\Normalization\PropertySkipper;
-use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
-use Opensoft\SimpleSerializer\Exclusion\GroupsSpecification;
-use Opensoft\SimpleSerializer\Exclusion\VersionSpecification;
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DataProcessor;
-use DateTime;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
@@ -656,7 +657,8 @@ class ArrayNormalizerTest extends \PHPUnit_Framework_TestCase
             'Opensoft\SimpleSerializer\Metadata\Driver\YamlDriver',
             array($locator)
         );
+        $dataProcessor = new DataProcessor(new TransformerFactory());
         $this->metadataFactory = new MetadataFactory($driver);
-        $this->unitUnderTest = $this->getMockForAbstractClass('\Opensoft\SimpleSerializer\Normalization\ArrayNormalizer', array($this->metadataFactory, new PropertySkipper(), new DataProcessor()));
+        $this->unitUnderTest = $this->getMockForAbstractClass('\Opensoft\SimpleSerializer\Normalization\ArrayNormalizer', array($this->metadataFactory, new PropertySkipper(), $dataProcessor));
     }
 }

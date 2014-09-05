@@ -86,5 +86,32 @@ class DateTimeTransformer implements Transformer
 
         return $dateTimeFormat;
     }
+
+    /**
+     * @param $type
+     * @return bool
+     */
+    public function supportType($type)
+    {
+        return $type === 'DateTime' || ($type[0] === 'D' && strpos($type, 'DateTime<') === 0);
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public function supportValueForNormalization($value)
+    {
+        return $value instanceof \DateTime;
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public function supportValueForDenormalization($value)
+    {
+        return is_string($value);
+    }
 }
 

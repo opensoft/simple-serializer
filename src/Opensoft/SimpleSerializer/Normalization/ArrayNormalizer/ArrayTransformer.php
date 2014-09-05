@@ -97,4 +97,31 @@ class ArrayTransformer implements Transformer
 
         return $itemProperty;
     }
+
+    /**
+     * @param $type
+     * @return bool
+     */
+    public function supportType($type)
+    {
+        return $type === 'array' || ($type[0] === 'a' && strpos($type, 'array<') === 0);
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public function supportValueForNormalization($value)
+    {
+        return is_array($value);
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public function supportValueForDenormalization($value)
+    {
+        return is_array($value);
+    }
 }

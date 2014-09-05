@@ -10,11 +10,13 @@
 
 namespace Opensoft\SimpleSerializer\Tests\Normalization\ArrayNormalizer;
 
-use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
+
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DataProcessor;
-use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\TransformerFactory;
 use Opensoft\SimpleSerializer\Normalization\PropertySkipper;
+use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
+use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
 
 /**
@@ -61,7 +63,7 @@ class BaseTest extends \PHPUnit_Framework_TestCase
             $metadataFactory = new MetadataFactory($driver);
         }
 
-        $this->processor = $processor ? $processor : new DataProcessor();
+        $this->processor = $processor ? $processor : new DataProcessor(new TransformerFactory());
         $this->metadataFactory = $metadataFactory;
         $this->normalizer = new ArrayNormalizer($this->metadataFactory, new PropertySkipper(), $this->processor);
     }

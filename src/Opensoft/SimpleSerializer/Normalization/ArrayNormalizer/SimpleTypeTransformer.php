@@ -67,13 +67,32 @@ class SimpleTypeTransformer implements Transformer
 
     /**
      * @param string $type
+     * @return bool
      */
-    public static function supportType($type)
+    public function supportType($type)
     {
         return in_array(
             $type,
             array('string', 'boolean', 'integer', 'double'),
             true
         );
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public function supportValueForNormalization($value)
+    {
+        return true;
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public function supportValueForDenormalization($value)
+    {
+       return true;
     }
 }

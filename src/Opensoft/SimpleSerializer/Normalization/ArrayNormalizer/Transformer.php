@@ -31,4 +31,22 @@ interface Transformer
      * @return mixed
      */
     function denormalize($value, $property, $object);
+
+    /**
+     * @param $type
+     * @return bool
+     */
+    function supportType($type);
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    function supportValueForNormalization($value);
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    function supportValueForDenormalization($value);
 } 

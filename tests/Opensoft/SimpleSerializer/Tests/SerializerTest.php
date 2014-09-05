@@ -11,16 +11,17 @@
 
 namespace Opensoft\SimpleSerializer\Tests;
 
-use Opensoft\SimpleSerializer\Serializer;
+use DateTime;
+use Opensoft\SimpleSerializer\Exclusion\GroupsSpecification;
+use Opensoft\SimpleSerializer\Exclusion\VersionSpecification;
 use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DataProcessor;
+use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\TransformerFactory;
+use Opensoft\SimpleSerializer\Normalization\PropertySkipper;
+use Opensoft\SimpleSerializer\Serializer;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A;
-use Opensoft\SimpleSerializer\Exclusion\VersionSpecification;
-use Opensoft\SimpleSerializer\Exclusion\GroupsSpecification;
-use Opensoft\SimpleSerializer\Normalization\PropertySkipper;
-use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DataProcessor;
-use DateTime;
 
 /**
  * @author Dmitry Petrov <dmitry.petrov@opensoftdev.ru>
@@ -495,7 +496,8 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
             array($locator)
         );
         $this->metadataFactory = new MetadataFactory($driver);
-        $arrayNormalizer = $this->getMockForAbstractClass('\Opensoft\SimpleSerializer\Normalization\ArrayNormalizer', array($this->metadataFactory, new PropertySkipper(), new DataProcessor()));
+        $dataProcessor = new DataProcessor(new TransformerFactory());
+        $arrayNormalizer = $this->getMockForAbstractClass('\Opensoft\SimpleSerializer\Normalization\ArrayNormalizer', array($this->metadataFactory, new PropertySkipper(), $dataProcessor));
         $serializerEncoder = $this->getMockForAbstractClass('Opensoft\SimpleSerializer\Encoder\JsonEncoder');
         $this->unitUnderTest = new Serializer($arrayNormalizer, $serializerEncoder);
     }
