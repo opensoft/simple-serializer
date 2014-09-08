@@ -64,6 +64,26 @@ class ArrayTransformerTest extends BaseTest
     }
 
     /**
+     * @dataProvider childrenDataProvider
+     * @param AChildren $aChildren
+     * @param array $aChildrenAsArray
+     */
+    public function testSupportValue($aChildren, $aChildrenAsArray)
+    {
+        $this->assertTrue($this->arrayTransformer->supportValueForNormalization($aChildrenAsArray));
+        $this->assertTrue($this->arrayTransformer->supportValueForDenormalization($aChildrenAsArray));
+        $this->assertFalse($this->arrayTransformer->supportValueForNormalization($aChildren));
+        $this->assertFalse($this->arrayTransformer->supportValueForDenormalization($aChildren));
+    }
+
+    public function testSupportType()
+    {
+        $this->assertTrue($this->arrayTransformer->supportType('array'));
+        $this->assertTrue($this->arrayTransformer->supportType('array<'));
+        $this->assertFalse($this->arrayTransformer->supportType('array('));
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp()

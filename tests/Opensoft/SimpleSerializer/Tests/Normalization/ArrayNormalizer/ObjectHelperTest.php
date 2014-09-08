@@ -10,6 +10,7 @@
 
 namespace Opensoft\SimpleSerializer\Tests\Normalization\ArrayNormalizer;
 
+use DateTime;
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\ObjectHelper;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
 use Opensoft\SimpleSerializer\Metadata\PropertyMetadata;
@@ -22,7 +23,7 @@ class ObjectHelperTest extends \PHPUnit_Framework_TestCase
     public function testExpose()
     {
         $time = time();
-        $testTime = new \DateTime(date('Y-m-d H:i:s', $time));
+        $testTime = new DateTime(date('Y-m-d H:i:s', $time));
         $aChildren = new AChildren();
         $aChildren->setRid(1);
         $aChildren->setStatus(true);

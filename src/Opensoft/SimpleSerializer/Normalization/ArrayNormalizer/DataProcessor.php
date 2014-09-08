@@ -55,8 +55,7 @@ class DataProcessor
         );
 
         $supports = false;
-        foreach($transformerAliases as $transformerAlias)
-        {
+        foreach($transformerAliases as $transformerAlias) {
             $transformer = $this->transformerFactory->getTransformer($transformerAlias, $normalizer, $this);
             if ($transformer->supportType($property->getType()) && $transformer->supportValueForNormalization($value)) {
                 $value = $transformer->normalize($value, $property);
@@ -78,7 +77,7 @@ class DataProcessor
      * @param PropertyMetadata $property
      * @param mixed $object
      * @param bool $inner
-     * @return array|bool|\DateTime|float|int|null|string
+     * @return array|bool|DateTime|float|int|null|string
      * @throws InvalidArgumentException
      */
     public function denormalizeProcess(ArrayNormalizer $normalizer, $value, $property, $object, $inner = false)
@@ -95,8 +94,7 @@ class DataProcessor
         );
 
         $supports = false;
-        foreach($transformerAliases as $transformerAlias)
-        {
+        foreach($transformerAliases as $transformerAlias) {
             $transformer = $this->transformerFactory->getTransformer($transformerAlias, $normalizer, $this);
             if ($transformer->supportType($property->getType()) && $transformer->supportValueForDenormalization($value)) {
                 if ($transformerAlias === TransformerFactory::TYPE_OBJECT_TRANSFORMER && !$inner) {

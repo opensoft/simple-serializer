@@ -52,8 +52,7 @@ class TransformerFactory
      */
     private function makeTransformer($alias,ArrayNormalizer $normalizer,DataProcessor $dataProcessor)
     {
-        switch($alias)
-        {
+        switch($alias) {
             case self::TYPE_SIMPLE_TRANSFORMER:
                 return new SimpleTypeTransformer();
             case self::TYPE_DATETIME_TRANSFORMER:

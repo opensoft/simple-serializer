@@ -10,6 +10,7 @@
 
 namespace Opensoft\SimpleSerializer\Tests\Normalization\ArrayNormalizer;
 
+use DateTime;
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
 
@@ -37,12 +38,12 @@ class DataProcessorTest extends BaseTest
         $normalized = $this->processor->normalizeProcess($this->normalizer, 27.0292, $this->makeSimpleProperty('someProperty', 'double'));
         $this->assertEquals(27.0292, $normalized);
 
-        $dateTime = new \DateTime(date('Y-m-d H:i:s', time()));
+        $dateTime = new DateTime(date('Y-m-d H:i:s', time()));
         $normalized = $this->processor->normalizeProcess($this->normalizer, $dateTime, $this->makeSimpleProperty('someProperty', 'DateTime'));
-        $this->assertEquals($dateTime->format(\DateTime::ISO8601), $normalized);
+        $this->assertEquals($dateTime->format(DateTime::ISO8601), $normalized);
 
         $normalized = $this->processor->normalizeProcess($this->normalizer, $dateTime, $this->makeSimpleProperty('someProperty', 'DateTime<COOKIE>'));
-        $this->assertEquals($dateTime->format(\DateTime::COOKIE), $normalized);
+        $this->assertEquals($dateTime->format(DateTime::COOKIE), $normalized);
 
         $array = array(1, 2, 3, 4);
         $normalized = $this->processor->normalizeProcess($this->normalizer, $array, $this->makeSimpleProperty('someProerty', 'array'));
@@ -75,12 +76,12 @@ class DataProcessorTest extends BaseTest
         $this->assertEquals(27.0292, $denormalized);
 
         $time = time();
-        $dateTime = new \DateTime(date('Y-m-d H:i:s', $time));
-        $denormalized = $this->processor->denormalizeProcess($this->normalizer, $dateTime->format(\DateTime::ISO8601), $this->makeSimpleProperty('someProperty', 'DateTime'), new \stdClass);
+        $dateTime = new DateTime(date('Y-m-d H:i:s', $time));
+        $denormalized = $this->processor->denormalizeProcess($this->normalizer, $dateTime->format(DateTime::ISO8601), $this->makeSimpleProperty('someProperty', 'DateTime'), new \stdClass);
         $this->assertEquals($dateTime, $denormalized);
 
-        $denormalized = $this->processor->denormalizeProcess($this->normalizer, $dateTime->format(\DateTime::ATOM), $this->makeSimpleProperty('someProperty', 'DateTime<ATOM>'), new \stdClass());
-        $this->assertEquals($dateTime->format(\DateTime::ATOM), $denormalized->format(\DateTime::ATOM));
+        $denormalized = $this->processor->denormalizeProcess($this->normalizer, $dateTime->format(DateTime::ATOM), $this->makeSimpleProperty('someProperty', 'DateTime<ATOM>'), new \stdClass());
+        $this->assertEquals($dateTime->format(DateTime::ATOM), $denormalized->format(DateTime::ATOM));
 
         $array = array(1, 2, 3, 4);
         $object = new \stdClass();

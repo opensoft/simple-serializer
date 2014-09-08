@@ -32,7 +32,7 @@ class ObjectTransformerTest extends BaseTest
      * @param AChildren $aChildren
      * @param array $aChildrenAsArray
      */
-    public function testNormalization($aChildren, $aChildrenAsArray)
+    public function testNormalization(AChildren $aChildren,array $aChildrenAsArray)
     {
         $normalizedChildren = $this->transformer->normalize($aChildren, new PropertyMetadata('children'));
         $this->assertEquals($aChildrenAsArray, $normalizedChildren);
@@ -43,7 +43,7 @@ class ObjectTransformerTest extends BaseTest
      * @param AChildren $aChildren
      * @param array $aChildrenAsArray
      */
-    public function testDenormalization($aChildren, $aChildrenAsArray)
+    public function testDenormalization(AChildren $aChildren,array $aChildrenAsArray)
     {
         $object = new AChildren();
         $property = $this->makeSimpleProperty('children', 'Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren');
@@ -55,6 +55,19 @@ class ObjectTransformerTest extends BaseTest
 
         $object = $this->transformer->denormalize($aChildrenAsArray, $property, new A(), true);
         $this->assertEquals($aChildren, $object);
+    }
+
+    /**
+     * @dataProvider childrenDataProvider
+     * @param AChildren $aChildren
+     * @param array $aChildrenAsArray
+     */
+    public function testSupportValue(AChildren $aChildren,array $aChildrenAsArray)
+    {
+        $this->assertTrue($this->transformer->supportValueForNormalization($aChildren));
+        $this->assertTrue($this->transformer->supportValueForDenormalization($aChildrenAsArray));
+        $this->assertFalse($this->transformer->supportValueForNormalization($aChildrenAsArray));
+        $this->assertFalse($this->transformer->supportValueForDenormalization($aChildren));
     }
 
     /**

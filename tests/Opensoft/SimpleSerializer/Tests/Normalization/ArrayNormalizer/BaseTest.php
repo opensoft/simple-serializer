@@ -10,7 +10,7 @@
 
 namespace Opensoft\SimpleSerializer\Tests\Normalization\ArrayNormalizer;
 
-
+use DateTime;
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer;
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\DataProcessor;
 use Opensoft\SimpleSerializer\Normalization\ArrayNormalizer\TransformerFactory;
@@ -87,7 +87,7 @@ class BaseTest extends \PHPUnit_Framework_TestCase
     public function childrenDataProvider()
     {
         $time = time();
-        $testTime = new \DateTime(date('Y-m-d H:i:s', $time));
+        $testTime = new DateTime(date('Y-m-d H:i:s', $time));
         $aChildren = new AChildren();
         $aChildren->setRid(1);
         $aChildren->setStatus(true);
@@ -104,7 +104,7 @@ class BaseTest extends \PHPUnit_Framework_TestCase
             'name' => 'name',
             'status' => true,
             'float' => 3.23,
-            'dateTime' => $testTime->format(\DateTime::ISO8601),
+            'dateTime' => $testTime->format(DateTime::ISO8601),
             'null' => null,
             'array' => array(3, null),
             'assocArray' => array('tr' => 2)

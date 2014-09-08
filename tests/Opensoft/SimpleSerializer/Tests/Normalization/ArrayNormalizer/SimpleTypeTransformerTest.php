@@ -45,6 +45,16 @@ class SimpleTypeTransformerTest extends BaseTest
     }
 
     /**
+     * @dataProvider provider
+     * @param mixed $value
+     */
+    public function testSupportValue($value)
+    {
+        $this->assertTrue($this->transformer->supportValueForNormalization($value));
+        $this->assertTrue($this->transformer->supportValueForDenormalization($value));
+    }
+
+    /**
      * @return array
      */
     public function provider()

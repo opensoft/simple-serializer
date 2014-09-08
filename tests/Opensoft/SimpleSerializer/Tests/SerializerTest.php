@@ -41,7 +41,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
     public function testSerialize()
     {
         $time = time();
-        $testTime = new \DateTime(date('Y-m-d H:i:s', $time));
+        $testTime = new DateTime(date('Y-m-d H:i:s', $time));
         $aChildren = new AChildren();
         $aChildren->setRid(1);
         $aChildren->setStatus(true);
@@ -57,7 +57,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $e->setObject($aChildren);
         $e->setArrayOfObjects(array($aChildren));
         $result = $this->unitUnderTest->serialize($e);
-        $expectedString = '{"rid":3,"object":{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}},"arrayOfObjects":[{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}}]}';
+        $expectedString = '{"rid":3,"object":{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}},"arrayOfObjects":[{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}}]}';
         $this->assertEquals($expectedString, $result);
         $this->assertEquals('[]', $this->unitUnderTest->serialize(array()));
     }
@@ -147,7 +147,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
     public function testArraySerialize()
     {
         $time = time();
-        $testTime = new \DateTime(date('Y-m-d H:i:s', $time));
+        $testTime = new DateTime(date('Y-m-d H:i:s', $time));
         $aChildren = new AChildren();
         $aChildren->setRid(1);
         $aChildren->setStatus(true);
@@ -163,7 +163,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $e->setObject($aChildren);
         $e->setArrayOfObjects(array($aChildren));
         $result = $this->unitUnderTest->serialize(array($e));
-        $expectedString = '[{"rid":3,"object":{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}},"arrayOfObjects":[{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}}]}]';
+        $expectedString = '[{"rid":3,"object":{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}},"arrayOfObjects":[{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}}]}]';
         $this->assertEquals($expectedString, $result);
     }
 
@@ -197,8 +197,8 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
     public function testUnserialize()
     {
         $time = time();
-        $testTime = new \DateTime(date('Y-m-d H:i:s', $time));
-        $data = '{"rid":3,"object":{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}},"arrayOfObjects":[{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}}]}';
+        $testTime = new DateTime(date('Y-m-d H:i:s', $time));
+        $data = '{"rid":3,"object":{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}},"arrayOfObjects":[{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}}]}';
         $emptyObject = new E();
         $result = $this->unitUnderTest->unserialize($data, $emptyObject);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E', $result);
@@ -222,7 +222,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('tr', $arrayAssoc);
         $this->assertEquals(2, $arrayAssoc['tr']);
         $this->assertInstanceOf('\DateTime', $result->getObject()->getDateTime());
-        $this->assertEquals($testTime->format(\DateTime::ISO8601), $result->getObject()->getDateTime()->format(DateTime::ISO8601));
+        $this->assertEquals($testTime->format(DateTime::ISO8601), $result->getObject()->getDateTime()->format(DateTime::ISO8601));
 
         $this->assertEquals(1, $objects[0]->getRid());
         $this->assertEquals('name', $objects[0]->getName());
@@ -239,7 +239,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('tr', $arrayAssoc);
         $this->assertEquals(2, $arrayAssoc['tr']);
         $this->assertInstanceOf('\DateTime', $objects[0]->getDateTime());
-        $this->assertEquals($testTime->format(\DateTime::ISO8601), $objects[0]->getDateTime()->format(DateTime::ISO8601));
+        $this->assertEquals($testTime->format(DateTime::ISO8601), $objects[0]->getDateTime()->format(DateTime::ISO8601));
     }
 
     public function testUnserializeGroup()
@@ -313,8 +313,8 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
     public function testUnserializeArray()
     {
         $time = time();
-        $testTime = new \DateTime(date('Y-m-d H:i:s', $time));
-        $data = '[{"rid":3,"object":{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}},"arrayOfObjects":[{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}}]}]';
+        $testTime = new DateTime(date('Y-m-d H:i:s', $time));
+        $data = '[{"rid":3,"object":{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}},"arrayOfObjects":[{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}}]}]';
         $emptyObject = new E();
         $result = $this->unitUnderTest->unserialize($data, array($emptyObject));
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E', $result[0]);
@@ -338,7 +338,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('tr', $arrayAssoc);
         $this->assertEquals(2, $arrayAssoc['tr']);
         $this->assertInstanceOf('\DateTime', $result[0]->getObject()->getDateTime());
-        $this->assertEquals($testTime->format(\DateTime::ISO8601), $result[0]->getObject()->getDateTime()->format(DateTime::ISO8601));
+        $this->assertEquals($testTime->format(DateTime::ISO8601), $result[0]->getObject()->getDateTime()->format(DateTime::ISO8601));
 
         $this->assertEquals(1, $objects[0]->getRid());
         $this->assertEquals('name', $objects[0]->getName());
@@ -355,7 +355,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('tr', $arrayAssoc);
         $this->assertEquals(2, $arrayAssoc['tr']);
         $this->assertInstanceOf('\DateTime', $objects[0]->getDateTime());
-        $this->assertEquals($testTime->format(\DateTime::ISO8601), $objects[0]->getDateTime()->format(DateTime::ISO8601));
+        $this->assertEquals($testTime->format(DateTime::ISO8601), $objects[0]->getDateTime()->format(DateTime::ISO8601));
     }
 
     public function testStrictUnserialize()
