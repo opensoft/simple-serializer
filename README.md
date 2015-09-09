@@ -102,6 +102,9 @@ MyBundle\Resources\config\serializer\ClassName.yml
  * string
 * groups
  * array
+* null_skipped
+ * true
+ * false (default)
 
 Serializing Objects
 -------------------
