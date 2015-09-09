@@ -1,0 +1,9 @@
+Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\F:
+    properties:
+        notNullSkipped:
+            type: string
+            expose: true
+        nullSkipped:
+            type: string
+            expose: true
+            null_skipped: true

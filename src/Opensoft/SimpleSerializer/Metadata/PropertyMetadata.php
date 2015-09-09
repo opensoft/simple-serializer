@@ -202,7 +202,7 @@ class PropertyMetadata implements Serializable
      */
     public function isNullSkipped()
     {
-        return $this->nullSkipped ? true : false;
+        return $this->nullSkipped;
     }
 
     /**
