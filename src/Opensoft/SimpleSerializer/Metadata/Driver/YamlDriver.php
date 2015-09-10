@@ -86,6 +86,10 @@ class YamlDriver extends AbstractFileDriver
             if (isset($propertyOptions['groups'])) {
                 $pMetadata->setGroups($propertyOptions['groups']);
             }
+
+            if (isset($propertyOptions['null_skipped'])) {
+                $pMetadata->setNullSkipped((boolean) $propertyOptions['null_skipped']);
+            }
             $metadata->addPropertyMetadata($pMetadata);
         }
 

@@ -54,6 +54,11 @@ class PropertyMetadata implements Serializable
     protected $untilVersion;
 
     /**
+     * @var bool
+     */
+    protected $nullSkipped;
+
+    /**
      * @param string $name
      */
     public function __construct($name)
@@ -185,6 +190,22 @@ class PropertyMetadata implements Serializable
     }
 
     /**
+     * @param bool $nullSkipped
+     */
+    public function setNullSkipped($nullSkipped)
+    {
+        $this->nullSkipped = ($nullSkipped === true) ? true : false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNullSkipped()
+    {
+        return $this->nullSkipped;
+    }
+
+    /**
      * @return string
      */
     public function serialize()
@@ -196,7 +217,8 @@ class PropertyMetadata implements Serializable
             $this->expose,
             $this->groups,
             $this->sinceVersion,
-            $this->untilVersion
+            $this->untilVersion,
+            $this->nullSkipped
         ));
     }
 
@@ -206,7 +228,7 @@ class PropertyMetadata implements Serializable
      */
     public function unserialize($str)
     {
-        list($this->name, $this->type, $this->serializedName, $this->expose, $this->groups, $this->sinceVersion, $this->untilVersion) = unserialize($str);
+        list($this->name, $this->type, $this->serializedName, $this->expose, $this->groups, $this->sinceVersion, $this->untilVersion, $this->nullSkipped) = unserialize($str);
 
         return $this;
     }

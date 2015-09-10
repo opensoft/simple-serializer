@@ -22,6 +22,7 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $unitUnderTest = new PropertyMetadata('testProperty');
         $this->assertEquals(false, $unitUnderTest->isExpose());
+        $this->assertEquals(false, $unitUnderTest->isNullSkipped());
         $this->assertInstanceOf('\Serializable', $unitUnderTest);
         $this->assertEquals('testProperty', $unitUnderTest->getName());
         $this->assertEquals('testProperty', $unitUnderTest->getSerializedName());
@@ -36,6 +37,9 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(false, $unitUnderTest->isExpose());
         $unitUnderTest->setExpose(true);
         $this->assertEquals(true, $unitUnderTest->isExpose());
+        $this->assertEquals(false, $unitUnderTest->isNullSkipped());
+        $unitUnderTest->setNullSkipped(true);
+        $this->assertEquals(true, $unitUnderTest->isNullSkipped());
         $unitUnderTest->setSerializedName('serialized');
         $this->assertEquals('serialized', $unitUnderTest->getSerializedName());
         $unitUnderTest->setType('string');
@@ -57,13 +61,15 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
             ->setType('string')
             ->setGroups(array('test'))
             ->setSinceVersion('1.0')
-            ->setUntilVersion('2.0');
+            ->setUntilVersion('2.0')
+            ->setNullSkipped(true);
 
         $serializedString = serialize($unitUnderTest);
         $unserializedObject = unserialize($serializedString);
         $this->assertInstanceOf('Opensoft\SimpleSerializer\Metadata\PropertyMetadata', $unserializedObject);
         $this->assertEquals('test', $unserializedObject->getName());
         $this->assertTrue($unserializedObject->isExpose());
+        $this->assertTrue($unserializedObject->isNullSkipped());
         $this->assertEquals('string', $unserializedObject->getType());
         $this->assertEquals('serialize', $unserializedObject->getSerializedName());
         $this->assertEquals(array('test'), $unserializedObject->getGroups());

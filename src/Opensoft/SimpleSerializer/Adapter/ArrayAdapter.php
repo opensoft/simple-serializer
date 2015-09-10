@@ -74,8 +74,11 @@ class ArrayAdapter implements BaseArrayAdapter
             }
 
             $value = $this->exposeValue($object, $property);
-
             $value = $this->handleValue($value, $property, self::DIRECTION_SERIALIZE);
+
+            if ($property->isNullSkipped() && $value === null) {
+                continue;
+            }
 
             $result[$property->getSerializedName()] = $value;
         }

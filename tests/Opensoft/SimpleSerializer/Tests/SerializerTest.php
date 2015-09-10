@@ -16,6 +16,7 @@ use Opensoft\SimpleSerializer\Metadata\MetadataFactory;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\E;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\AChildren;
 use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\A;
+use Opensoft\SimpleSerializer\Tests\Metadata\Driver\Fixture\A\F;
 use Opensoft\SimpleSerializer\Exclusion\VersionExclusionStrategy;
 use Opensoft\SimpleSerializer\Exclusion\GroupsExclusionStrategy;
 use DateTime;
@@ -57,6 +58,10 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $expectedString = '{"rid":3,"object":{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}},"arrayOfObjects":[{"id":1,"name":"name","status":true,"float":3.23,"dateTime":"' . $testTime->format(\DateTime::ISO8601) . '","null":null,"array":[3,null],"assocArray":{"tr":2}}]}';
         $this->assertEquals($expectedString, $result);
         $this->assertEquals('[]', $this->unitUnderTest->serialize(array()));
+        $f = new F();
+        $result = $this->unitUnderTest->serialize($f);
+        $expectedString = '{"notNullSkipped":null}';
+        $this->assertEquals($expectedString, $result);
     }
 
     public function testSerializeGroup()
