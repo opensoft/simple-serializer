@@ -31,6 +31,13 @@ class ArrayAdapter implements BaseArrayAdapter
     const MEDIUM_STRICT_MODE = 1;
     const NON_STRICT_MODE = 0;
 
+    const TYPE_ARRAY = 'array';
+    const TYPE_BOOLEAN = 'boolean';
+    const TYPE_DOUBLE = 'double';
+    const TYPE_INTEGER = 'integer';
+    const TYPE_OBJECT = 'object';
+    const TYPE_STRING = 'string';
+
     /**
      * @var MetadataFactory
      */
@@ -218,20 +225,28 @@ class ArrayAdapter implements BaseArrayAdapter
      * @param $direct
      * @param null|mixed $object
      * @param bool $inner
-     * @throws \Opensoft\SimpleSerializer\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return array|bool|float|int|string|null
      */
     private function handleValue($value, $property, $direct, $object = null, $inner = false)
     {
         $type = $property->getType();
         if ($value !== null) {
-            if ($type === 'string') {
+            if (!$this->isValueTypeSupported($value, $type)) {
+                throw new InvalidArgumentException(sprintf(
+                    'Invalid value type of the "%s" field. Expected type is "%s".',
+                    $property->getSerializedName(),
+                    $type
+                ));
+            }
+
+            if ($type === self::TYPE_STRING) {
                 $value = (string)$value;
-            } elseif ($type === 'boolean') {
+            } elseif ($type === self::TYPE_BOOLEAN) {
                 $value = (boolean)$value;
-            } elseif ($type === 'integer') {
+            } elseif ($type === self::TYPE_INTEGER) {
                 $value = (integer)$value;
-            } elseif ($type === 'double') {
+            } elseif ($type === self::TYPE_DOUBLE) {
                 $value = (double)$value;
             } elseif ($type === 'DateTime' || ($type[0] === 'D' && strpos($type, 'DateTime<') === 0)) {
                 if ($direct == self::DIRECTION_SERIALIZE) {
@@ -260,7 +275,7 @@ class ArrayAdapter implements BaseArrayAdapter
                         throw new InvalidArgumentException(sprintf('Invalid DateTime argument "%s"', $originalValue));
                     }
                 }
-            } elseif ($type === 'array' || ($type[0] === 'a' && strpos($type, 'array<') === 0)) {
+            } elseif ($type === self::TYPE_ARRAY || ($type[0] === 'a' && strpos($type, 'array<') === 0)) {
                 $tmpResult = array();
                 $tmpType = new PropertyMetadata($property->getName());
                 $tmpType->setExpose(true)->setSerializedName($property->getSerializedName());
@@ -364,5 +379,50 @@ class ArrayAdapter implements BaseArrayAdapter
         }
 
         return $dateTimeFormat;
+    }
+
+    /**
+     * Returns result of comparison of the "value" type with the "expectedType".
+     * By default if an expected type is not in type list and the "strictMode" is set to "true"
+     * the "false" is returned otherwise the "true".
+     *
+     * @param mixed $value
+     * @param string $expectedType
+     * @param boolean $isStrictMode
+     *
+     * @return bool
+     */
+    private function isValueTypeSupported($value, $expectedType, $isStrictMode = false)
+    {
+        switch ($expectedType) {
+            case self::TYPE_ARRAY:
+                $validationResult = is_array($value);
+                break;
+
+            case self::TYPE_BOOLEAN:
+                $validationResult = is_bool($value);
+                break;
+
+            case self::TYPE_DOUBLE:
+                $validationResult = is_float($value);
+                break;
+
+            case self::TYPE_INTEGER:
+                $validationResult = is_int($value);
+                break;
+
+            case self::TYPE_OBJECT:
+                $validationResult = is_object($value);
+                break;
+
+            case self::TYPE_STRING:
+                $validationResult = is_string($value);
+                break;
+
+            default:
+                $validationResult = !$isStrictMode;
+        }
+
+        return $validationResult;
     }
 }
