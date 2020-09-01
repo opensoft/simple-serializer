@@ -52,7 +52,7 @@ class Serializer
      * @param object|array $data
      * @return string
      */
-    public function serialize($data)
+    public function serialize($data, $className = null)
     {
         $this->level++;
         $dataAsArray = null;
@@ -62,7 +62,7 @@ class Serializer
                 $dataAsArray[$key] = $this->serialize($object);
             }
         } else if (is_object($data)) {
-            $dataAsArray = $this->arrayAdapter->toArray($data);
+            $dataAsArray = $this->arrayAdapter->toArray($data, $className);
         } else {
             $dataAsArray = $data;
         }

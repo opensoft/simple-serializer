@@ -23,9 +23,10 @@ interface ArrayAdapterInterface
      *
      * @abstract
      * @param object $object
+     * @param string $className - allows specifying class name
      * @return mixed
      */
-    public function toArray($object);
+    public function toArray($object, $className = null);
 
     /**
      * Convert array to object

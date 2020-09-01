@@ -17,7 +17,7 @@
         "symfony/yaml": ">=2.0.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.0.*@stable"
+        "phpunit/phpunit": "4.1.*@stable"
     },
     "minimum-stability": "stable",
     "autoload": {

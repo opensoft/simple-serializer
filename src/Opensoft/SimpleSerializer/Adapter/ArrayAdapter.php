@@ -61,12 +61,15 @@ class ArrayAdapter implements BaseArrayAdapter
      * {@inheritDoc}
      *
      * @param object $object
+     * @param string $className
      * @return mixed
      */
-    public function toArray($object)
+    public function toArray($object, $className = null)
     {
         $result = array();
-        $className = $this->getFullClassName($object);
+        if (!$className) {
+            $className = $this->getFullClassName($object);
+        }
         $metadata = $this->metadataFactory->getMetadataForClass($className);
         foreach ($metadata->getProperties() as $property) {
             if (!$property->isExpose() || $this->propertySkipper->shouldSkip($property)) {
