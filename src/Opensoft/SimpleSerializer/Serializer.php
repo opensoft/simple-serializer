@@ -89,6 +89,8 @@ class Serializer
         }
         if (is_object($targetData)) {
             return $this->arrayAdapter->toObject($unserializedData, $targetData);
+        } else if (is_string($targetData) && class_exists($targetData)) {
+            return $this->arrayAdapter->toObjectOfClass($unserializedData, $targetData);
         } else if (is_array($targetData)) {
             $this->level++;
             $result = array();
