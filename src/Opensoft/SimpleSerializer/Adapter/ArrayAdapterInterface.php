@@ -60,4 +60,14 @@ interface ArrayAdapterInterface
      * @return ArrayAdapterInterface
      */
     public function setUnserializeMode($unserializeMode);
+
+    /**
+     * Convert array to object of given classname
+     * This method implies that class constructor is public and does not require any parameters
+     *
+     * @abstract
+     * @param mixed $data
+     * @param string $className
+     */
+    public function toObjectOfClass(array $data, $className);
 }

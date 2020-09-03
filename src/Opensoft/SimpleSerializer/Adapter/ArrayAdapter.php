@@ -365,4 +365,11 @@ class ArrayAdapter implements BaseArrayAdapter
 
         return $dateTimeFormat;
     }
+
+    public function toObjectOfClass(array $data, $className)
+    {
+        $newInstance = new $className;
+
+        return $this->toObject($data, $newInstance);
+    }
 }
